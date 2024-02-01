@@ -52,7 +52,8 @@ class BuildCFFISetuptools(_build_ext):
                 #     os.rename(os.path.join(lib_dir, _a), os.path.join(lib_dir, lib_file))
                 # self.spawn(['lib', f'/DEF:{lib_fp}', f'/OUT:{lib_file}'])
                 # self.spawn(['nm', '-g', f'{lib_dir}/{lib_file}'])  # using a msys2 command with unix path
-                _ = ['nm', '-g', f'{lib_dir}/{lib_file}']
+                args = ['nm.exe', '-g', f'{lib_dir}/{lib_file}']
+                data = subprocess.check_output(args, shell=False, check=True)  # noqa S603
                 # log.info(subprocess.check_output(
                 # ['nm', '-g', f'{lib_dir}/{lib_file}'], shell=True, check=True))  # S603
                 # self.spawn(['dumpbin.exe', '/ALL', f'{lib_dir}/{lib_file}'.replace('/', '\\\\')])
