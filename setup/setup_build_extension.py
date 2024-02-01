@@ -53,7 +53,7 @@ class BuildCFFISetuptools(_build_ext):
                 # self.spawn(['lib', f'/DEF:{lib_fp}', f'/OUT:{lib_file}'])
                 # self.spawn(['nm', '-g', f'{lib_dir}/{lib_file}'])  # using a msys2 command with unix path
                 args = ['nm.exe', '-g', f'{lib_dir}/{lib_file}']
-                data = subprocess.check_output(args)  # noqa S603
+                data = subprocess.check_output(args).split(b"\\n")  # noqa S603
                 log.info(f'build_extensions: Lib symbols: {data}')
                 # log.info(subprocess.check_output(
                 # ['nm', '-g', f'{lib_dir}/{lib_file}'], shell=True, check=True))  # S603
@@ -63,7 +63,7 @@ class BuildCFFISetuptools(_build_ext):
                 self.extensions[0].extra_link_args.append(lib_fp)
 
         if compiler == 'MSVCCompiler':
-            self.extensions[0].extra_compile_args.append('/MT')
+            # self.extensions[0].extra_compile_args.append('/MT')
             # https://cibuildwheel.readthedocs.io/en/1.x/faq/#importerror-dll-load-failed-the-specific-module-could-not-be-found-error-on-windows
             self.extensions[0].extra_compile_args.append('/d2FH4-') if sys.platform == 'win32' else None
 
