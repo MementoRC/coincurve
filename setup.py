@@ -17,8 +17,8 @@ except ImportError:
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from setup.setup_config import LIB_NAME, PKGCONFIG  # noqa: E402
-from setup.setup_support import detect_dll, has_system_lib, download_library  # noqa: E402
+from setup.setup_config import LIB_NAME, PKGCONFIG
+from setup.setup_support import detect_dll, has_system_lib, download_library
 
 BUILDING_FOR_WINDOWS = detect_dll()
 
