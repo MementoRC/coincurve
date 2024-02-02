@@ -55,6 +55,8 @@ class BuildCFFISetuptools(_build_ext):
                 args = ['nm.exe', '-g', f'{lib_dir}/{lib_file}']
                 data = subprocess.check_output(args).split(b"\\n")  # noqa S603
                 log.info(f'build_extensions: Lib symbols: {data}')
+                data = subprocess.check_output(['vswhere', '-latest', '-find', '**/dumpbin.exe']).split(b"\\n")  # noqa S603
+                log.info(f'build_extensions: dumpbin: {data}')
                 # log.info(subprocess.check_output(
                 # ['nm', '-g', f'{lib_dir}/{lib_file}'], shell=True, check=True))  # S603
                 # self.spawn(['dumpbin.exe', '/ALL', f'{lib_dir}/{lib_file}'.replace('/', '\\\\')])
@@ -73,6 +75,7 @@ class BuildCFFISetuptools(_build_ext):
             log.info(f'build_extensions: MSVCCompiler: {link_args_msvc}')
 
         super().build_extensions()
+        log.info('build_extensions: CFFI build completed')
 
 
 class _BuildCFFILib(BuildCFFISetuptools):
