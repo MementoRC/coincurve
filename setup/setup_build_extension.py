@@ -55,9 +55,8 @@ class BuildCFFISetuptools(_build_ext):
                 args = ['nm.exe', '-g', f'{lib_dir}/{lib_file}']
                 data = subprocess.check_output(args).split(b"\\n")  # noqa S603
                 log.info(f'build_extensions: Lib symbols: {data}')
-                data = subprocess.check_output(['vswhere', '-latest', '-find', '**/dumpbin.exe']).split(
-                    b'\\n'
-                )  # S603
+                args = ['dumpbin.exe', '/ALL', f'{lib_dir}/{lib_file}'.replace('/', '\\\\')]
+                data = subprocess.check_output(args).split(b'\\n')  # noqa S603 S607
                 log.info(f'build_extensions: dumpbin: {data}')
                 # log.info(subprocess.check_output(
                 # ['nm', '-g', f'{lib_dir}/{lib_file}'], shell=True, check=True))  # S603
