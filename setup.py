@@ -147,7 +147,7 @@ class BuildClibWithCmake(build_clib.build_clib):
             # For windows, select the correct toolchain file
             cmake_args.extend([
                 '-G "Visual Studio 16 2019"',
-                # '-A "Win64"',
+                # '-A "x64"',
                 ])
             # Possible alternative?
             # cmake_args.append(
