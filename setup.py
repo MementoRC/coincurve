@@ -141,9 +141,10 @@ class BuildClibWithCmake(build_clib.build_clib):
 
         elif os.name == 'nt':
             # For windows, select the correct toolchain file
-            cmake_args.append(
-                '-G Visual Studio 16 2019 -A Win64'
-            )
+            cmake_args.extend([
+                '-G Visual Studio 16 2019',
+                '-A Win64',
+                ])
             # Possible alternative?
             # cmake_args.append(
             #     '-G "Ninja" -A Win64'
