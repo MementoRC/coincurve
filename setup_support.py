@@ -203,10 +203,10 @@ def execute_command_with_temp_log(cmd, cwd=None, debug=False, capture_output=Fal
                 log_contents = temp_log.read()
                 logging.info(f'Command log:\n{log_contents}')
             return ret
+
         except subprocess.CalledProcessError as e:
             logging.error(f'An error occurred during the command execution: {e}')
             temp_log.seek(0)
             log_contents = temp_log.read()
             logging.error(f'Command log:\n{log_contents}')
             raise e
-

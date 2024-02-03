@@ -141,7 +141,10 @@ class BuildClibWithCmake(build_clib.build_clib):
 
         elif os.name == 'nt':
             vswhere = shutil.which('vswhere')
-            msvc = execute_command_with_temp_log([vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\MSBuild.exe'])
+            msvc = execute_command_with_temp_log(
+                [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\MSBuild.exe'],
+                capture_output=True,
+            )
             logging.info(f'Using MSVC: {msvc}')
 
             # For windows, select the correct toolchain file
