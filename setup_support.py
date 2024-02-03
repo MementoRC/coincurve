@@ -193,7 +193,7 @@ def execute_command_with_temp_log(cmd, cwd=None, debug=False):
                 'stderr': temp_log,
                 'cwd': cwd,
             }
-            output = subprocess.check_output(**kwargs)  # noqa S603
+            output = subprocess.check_output(**kwargs)
             if debug:
                 temp_log.seek(0)
                 log_contents = temp_log.read()
