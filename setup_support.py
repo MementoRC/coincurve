@@ -184,25 +184,29 @@ def _download_library(lib_dir=None):
     os.remove(f'{UPSTREAM_REF}.tar.gz')
 
 
-def execute_command_with_temp_log(cmd, cwd=None, debug=False):
+def execute_command_with_temp_log(cmd, cwd=None, debug=False, capture_output=False):
     with tempfile.NamedTemporaryFile(mode='w+') as temp_log:
+        kwargs = {
+            'args': cmd,
+            'stderr': temp_log,
+            'cwd': cwd,
+        }
         try:
-            kwargs = {
-                'args': cmd,
-                'stdout': temp_log,
-                'stderr': temp_log,
-                'cwd': cwd,
-            }
-            output = subprocess.check_output(**kwargs)
+            if capture_output:
+                ret = subprocess.check_output(**kwargs)
+            else:
+                kwargs['stdout'] = temp_log
+                subprocess.check_call(**kwargs)
+                ret = None
             if debug:
                 temp_log.seek(0)
                 log_contents = temp_log.read()
                 logging.info(f'Command log:\n{log_contents}')
-            return output
-
+            return ret
         except subprocess.CalledProcessError as e:
             logging.error(f'An error occurred during the command execution: {e}')
             temp_log.seek(0)
             log_contents = temp_log.read()
             logging.error(f'Command log:\n{log_contents}')
             raise e
+
