@@ -5,7 +5,7 @@ from coincurve.ecdsa import cdata_to_der, der_to_cdata
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from tests.samples import SIGNATURE  # noqa: E402
+from tests.samples import SIGNATURE
 
 
 def test_der():

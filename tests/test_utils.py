@@ -21,7 +21,7 @@ from coincurve.utils import (
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from tests.samples import (  # noqa: E402
+from tests.samples import (
     MESSAGE,
     PRIVATE_KEY_DER,
     PUBLIC_KEY_COMPRESSED,

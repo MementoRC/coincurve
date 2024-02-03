@@ -152,7 +152,7 @@ def download_library(command, libdir=None, force=False):
 def _download_library(libdir):
     import requests
 
-    from setup.setup_config import LIB_TARBALL_URL
+    from setup.setup_config import LIB_TARBALL_URL, UPSTREAM_REF
 
     r = requests.get(LIB_TARBALL_URL, stream=True, timeout=10)
     status_code = r.status_code
@@ -160,10 +160,16 @@ def _download_library(libdir):
         raise SystemExit(f'Unable to download {libdir} library: HTTP-Status: {status_code}')
     content = BytesIO(r.raw.read())
     content.seek(0)
-    with tarfile.open(fileobj=content) as tf:
-        dirname = tf.getnames()[0].partition('/')[0]
-        tf.extractall()
-    shutil.move(dirname, libdir)
+
+    with tarfile.open(f'{UPSTREAM_REF}.tar.gz') as tf:
+        prefix, prefix_length = f'secp256k1-{UPSTREAM_REF}/', len(f'secp256k1-{UPSTREAM_REF}/')
+        for member in tf.getmembers():
+            if member.name.startswith(prefix):
+                member.name = member.name[prefix_length:]
+                tf.extract(member, path=libdir)
+
+    os.remove(f'{UPSTREAM_REF}.tar.gz')
+
 
 
 def exact_library_name(library, path):
