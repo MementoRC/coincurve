@@ -38,7 +38,7 @@ def redirect(stdchannel, dest_filename):
 
 
 def absolute_from_setup_dir(*paths):
-    from setup import PACKAGE_SETUP_DIR
+    from _config import PACKAGE_SETUP_DIR
 
     op = os.path
     return op.realpath(op.abspath(op.join(PACKAGE_SETUP_DIR, *paths)))
@@ -46,7 +46,7 @@ def absolute_from_setup_dir(*paths):
 
 def build_flags(library, type_, path='.'):
     """Return separated build flags from pkg-config output"""
-    from setup import PKGCONFIG
+    from _config import PKGCONFIG
 
     pkg_config_path = [path]
     if 'PKG_CONFIG_PATH' in os.environ:
@@ -69,16 +69,14 @@ def _find_lib():
     if 'COINCURVE_IGNORE_SYSTEM_LIB' in os.environ:
         return False
 
-    try:
-        from setup import PKGCONFIG
+    # Update the environment CONDA_PREFIX to the current environment
+    if 'CONDA_PREFIX' in os.environ:
+        os.environ['PKG_CONFIG_PATH'] = (
+            os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig') + ':' + os.environ.get('PKG_CONFIG_PATH', '')
+        )
 
-        # Update the environment CONDA_PREFIX to the current environment
-        if 'CONDA_PREFIX' in os.environ:
-            os.environ['PKG_CONFIG_PATH'] = (
-                os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig')
-                + ':'
-                + os.environ.get('PKG_CONFIG_PATH', '')
-            )
+    try:
+        from _config import PKGCONFIG
 
         includes = subprocess.check_output([PKGCONFIG, '--cflags-only-I', 'libsecp256k1'])  # noqa S603
         includes = includes.strip().decode('utf-8')
@@ -108,8 +106,11 @@ def has_system_lib():
 
 
 def detect_dll():
-    here = os.path.dirname(os.path.abspath(__file__))
-    for fn in os.listdir(os.path.join(here, 'coincurve')):
+    from importlib import import_module
+
+    setup = import_module('setup')
+
+    for fn in os.listdir(os.path.join(setup.COINCURVE_ROOT, 'coincurve')):
         if fn.endswith('.dll'):
             return True
     return False
