@@ -145,21 +145,19 @@ class BuildClibWithCmake(build_clib.build_clib):
                 [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\MSBuild.exe'],
                 capture_output=True,
             )
-            logging.info(f'Using MSVC: {msvc}')
 
             # For windows, select the correct toolchain file - DO NOT PUT SPACES
             cmake_args.extend([
                 '-G',
-                'Visual Studio 17 2022',
+                'Visual Studio 17 2022' if '2022' in msvc else 'Visual Studio 16 2019',
                 '-Ax64',
                 ])
-            # Possible alternative?
-            # cmake_args.append(
-            #     '-G "Ninja" -A Win64'
-            # )
 
         logging.info('    cmake config')
-        execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args])
+        execute_command_with_temp_log(
+            ['cmake', '-S', lib_src, '-B', build_temp, *cmake_args],
+            debug=True,
+        )
 
         try:
             os.chdir(build_temp)
