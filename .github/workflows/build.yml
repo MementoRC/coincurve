@@ -166,7 +166,7 @@ jobs:
 
     - uses: actions/setup-python@v3
 
-    - name: Remove libsecp256k1
+    - name: Remove libsecp256k1 egg-info
       run: |
         Get-ChildItem -Recurse -Filter *.egg-info | Remove-Item -Force
 
@@ -177,7 +177,7 @@ jobs:
 
     - name: Install build dependencies
       run: |
-        conda install -y m2-autoconf m2-automake-wrapper m2-base m2-bash m2-libtool m2-m4 m2-gzip m2-make m2-sed m2-tar pkg-config
+        conda install -y cmake>3.28 m2-autoconf m2-automake-wrapper m2-base m2-bash m2-libtool m2-m4 m2-gzip m2-make m2-sed m2-tar pkg-config
 
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
