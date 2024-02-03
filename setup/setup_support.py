@@ -171,7 +171,6 @@ def _download_library(libdir):
     os.remove(f'{UPSTREAM_REF}.tar.gz')
 
 
-
 def exact_library_name(library, path):
     # strip lib prefix and .so/.dylib/.dll suffix
     library = os.path.splitext(library)[0]
