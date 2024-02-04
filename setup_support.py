@@ -192,10 +192,10 @@ def execute_command_with_temp_log(cmd, cwd=None, debug=False, capture_output=Fal
         }
         try:
             if capture_output:
-                ret = subprocess.check_output(cmd, **kwargs)
+                ret = subprocess.check_output(cmd, **kwargs)  # noqa S603
             else:
                 kwargs['stdout'] = temp_log
-                subprocess.check_call(cmd, **kwargs)
+                subprocess.check_call(cmd, **kwargs)  # noqa S603
                 ret = None
 
             if debug:
