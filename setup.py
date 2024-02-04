@@ -29,17 +29,17 @@ LIB_NAME = 'libsecp256k1'
 BUILDING_FOR_WINDOWS = detect_dll()
 
 __version__ = None
-with open(join(COINCURVE_ROOT, 'coincurve', '_version.py')) as fp:
-    exec(fp.read())  # noqa S102
 
 
 def main():
-    package_data = {'coincurve': ['py.typed']}
     extension = Extension(
         name=f'coincurve._{LIB_NAME}',
         sources=[join('coincurve', f'_{LIB_NAME}.c')],
         py_limited_api=False,
     )
+
+    with open(join(COINCURVE_ROOT, 'coincurve', '_version.py')) as fp:
+        exec(fp.read())  # noqa S102
 
     if has_system_lib():
 
@@ -68,7 +68,6 @@ def main():
                 def is_pure(self):
                     return False
 
-            package_data['coincurve'].append('libsecp256k1.dll')
             setup_kwargs = {}
 
         else:
@@ -94,15 +93,9 @@ def main():
         name='coincurve',
         version=__version__,
 
-        #package_dir={'': 'coincurve'},
-        package_data={'coincurve': ['py.typed']},
         packages=find_packages(
-            where='',
-            include=['coincurve'],
-            exclude=['_cffi_build', 'setup_modules.*', 'tests', LIB_NAME],
+            exclude=['_cffi_build', 'setup_modules', 'tests', LIB_NAME],
             ),
-        # package_data=package_data,
-        exclude_package_data={'': ['_cffi_build/*', 'tests/*', 'setup_modules/*', 'libsecp256k1/*']},
 
         distclass=Distribution,
         zip_safe=False,
