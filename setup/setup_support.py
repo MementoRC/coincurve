@@ -158,8 +158,13 @@ def _download_library(libdir):
     status_code = r.status_code
     if status_code != 200:
         raise SystemExit(f'Unable to download {libdir} library: HTTP-Status: {status_code}')
+
     content = BytesIO(r.raw.read())
     content.seek(0)
+
+    # Write the content to a file
+    with open(f'{UPSTREAM_REF}.tar.gz', 'wb') as f:
+        f.write(content.getvalue())
 
     with tarfile.open(f'{UPSTREAM_REF}.tar.gz') as tf:
         prefix, prefix_length = f'secp256k1-{UPSTREAM_REF}/', len(f'secp256k1-{UPSTREAM_REF}/')
