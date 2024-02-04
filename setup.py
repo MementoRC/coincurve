@@ -30,7 +30,7 @@ BUILDING_FOR_WINDOWS = detect_dll()
 
 __version__ = None
 with open(join(COINCURVE_ROOT, 'coincurve', '_version.py')) as fp:
-    exec(fp.read())
+    exec(fp.read())  # noqa S102
 
 
 def main():
