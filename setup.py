@@ -33,12 +33,12 @@ __version__ = None
 
 def main():
     extension = Extension(
-        name=f'coincurve._{LIB_NAME}',
-        sources=[join('coincurve', f'_{LIB_NAME}.c')],
+        name=f'_{LIB_NAME}',
+        sources=[join('src/coincurve', f'_{LIB_NAME}.c')],
         py_limited_api=False,
     )
 
-    with open(join(COINCURVE_ROOT, 'coincurve', '_version.py')) as fp:
+    with open(join(COINCURVE_ROOT, 'src', 'coincurve', '_version.py')) as fp:
         exec(fp.read())  # noqa S102
 
     if has_system_lib():
@@ -91,11 +91,9 @@ def main():
 
     setup(
         name='coincurve',
-        version=__version__,
+        # version=__version__,
 
-        packages=find_packages(
-            exclude=['_cffi_build', 'setup_modules', 'tests', LIB_NAME],
-            ),
+        package_dir={'': 'src'},
 
         distclass=Distribution,
         zip_safe=False,
