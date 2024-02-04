@@ -184,19 +184,13 @@ def _download_library(lib_dir=None):
     os.remove(f'{UPSTREAM_REF}.tar.gz')
 
 
-def execute_command_with_temp_log(cmd, cwd=None, debug=False, capture_output=False):
+def execute_command_with_temp_log(cmd, debug=False, capture_output=False):
     with tempfile.NamedTemporaryFile(mode='w+') as temp_log:
-        kwargs = {
-            'stderr': temp_log,
-            'cwd': cwd,
-        }
         try:
             if capture_output:
-                ret = subprocess.check_output(cmd, **kwargs)  # noqa S603
+                ret = subprocess.check_output(cmd, stderr=temp_log)  # noqa S603
             else:
-                kwargs['stdout'] = temp_log
-                subprocess.check_call(cmd, **kwargs)  # noqa S603
-                ret = None
+                subprocess.check_call(cmd, stdout=temp_log, stderr=temp_log)  # noqa S603
 
             if debug:
                 temp_log.seek(0)
