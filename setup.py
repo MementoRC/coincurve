@@ -144,6 +144,7 @@ class BuildClibWithCmake(build_clib.build_clib):
             msvc = execute_command_with_temp_log(
                 [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\MSBuild.exe'],
                 capture_output=True,
+                debug=True,
             )
             logging.info(f'Using MSVC: {msvc}')
 
@@ -163,7 +164,7 @@ class BuildClibWithCmake(build_clib.build_clib):
             logging.info('    cmake build')
             execute_command_with_temp_log(['cmake', '--build', '.'])
 
-            logging.info('    cmake install')
+            logging.info('    cmake install -j 4')
             execute_command_with_temp_log(['cmake', '--install', '.'], debug=True)
         finally:
             os.chdir(cwd)
