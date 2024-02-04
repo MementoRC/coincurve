@@ -110,12 +110,7 @@ def detect_dll():
 
     setup = import_module('setup')
 
-    return any(
-        fn.endswith('.dll')
-        for fn in os.listdir(
-            os.path.join(setup.COINCURVE_ROOT, 'src', 'coincurve')
-        )
-    )
+    return any(fn.endswith('.dll') for fn in os.listdir(os.path.join(setup.COINCURVE_ROOT, 'src', 'coincurve')))
 
 
 def download_library(command, lib_dir='libsecp256k1', force=False):

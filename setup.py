@@ -1,8 +1,8 @@
 import os.path
-from sys import path as PATH
 from os.path import join, dirname, abspath
+from sys import path as PATH
 
-from setuptools import Distribution as _Distribution, setup, find_packages
+from setuptools import Distribution as _Distribution, setup
 from setuptools.extension import Extension
 
 COINCURVE_ROOT = dirname(abspath(__file__))
