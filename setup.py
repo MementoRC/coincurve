@@ -162,11 +162,15 @@ class BuildClibWithCmake(build_clib.build_clib):
         try:
             os.chdir(build_temp)
             logging.info('    cmake build')
-            execute_command_with_temp_log(['cmake', '--build', '.'], debug=True)
+            execute_command_with_temp_log(
+                ['cmake', '--build', '.'], debug=True)
 
             logging.info('    cmake install')
             if os.name == 'nt':
-                execute_command_with_temp_log(['cmake', '--build', '.', '--target', 'install'], debug=True)
+                execute_command_with_temp_log(
+                    ['cmake', '--build', '.', '--target', 'install', 'CMAKE_BUILD_TYPE=Release'],
+                    debug=True
+                )
             else:
                 execute_command_with_temp_log(['cmake', '--install', '.', '--verbose'], debug=True)
         finally:
@@ -176,7 +180,9 @@ class BuildClibWithCmake(build_clib.build_clib):
             os.path.join(install_lib_dir, 'lib', 'pkgconfig'),
             os.path.join(install_lib_dir, 'lib64', 'pkgconfig'),
         ]
-        os.environ['PKG_CONFIG_PATH'] = f'{":".join(self.pkgconfig_dir)}:{os.environ.get("PKG_CONFIG_PATH", "")}'
+        os.environ['PKG_CONFIG_PATH'] = (
+            f'{os.pathsep.join(self.pkgconfig_dir)}{os.pathsep}{os.environ.get("PKG_CONFIG_PATH", "")}'
+        )
 
         logging.info('build_clib: Done')
 
