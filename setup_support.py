@@ -187,22 +187,24 @@ def _download_library(lib_dir=None):
 def execute_command_with_temp_log(cmd, cwd=None, debug=False, capture_output=False):
     with tempfile.NamedTemporaryFile(mode='w+') as temp_log:
         kwargs = {
-            'args': cmd,
             'stderr': temp_log,
             'cwd': cwd,
         }
         try:
             if capture_output:
-                ret = subprocess.check_output(**kwargs)
+                ret = subprocess.check_output(cmd, **kwargs)
             else:
                 kwargs['stdout'] = temp_log
-                subprocess.check_call(**kwargs)
+                subprocess.check_call(cmd, **kwargs)
                 ret = None
+
             if debug:
                 temp_log.seek(0)
                 log_contents = temp_log.read()
                 logging.info(f'Command log:\n{log_contents}')
-            return ret
+
+            if capture_output:
+                return ret
 
         except subprocess.CalledProcessError as e:
             logging.error(f'An error occurred during the command execution: {e}')
