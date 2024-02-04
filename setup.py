@@ -160,9 +160,9 @@ class BuildClibWithCmake(build_clib.build_clib):
         try:
             os.chdir(build_temp)
             logging.info('    cmake build')
-            execute_command_with_temp_log(['cmake', '--build', '.'])
+            execute_command_with_temp_log(['cmake', '--build', '.'], debug=True)
 
-            logging.info('    cmake install -j 4')
+            logging.info('    cmake install')
             execute_command_with_temp_log(['cmake', '--install', '.'], debug=True)
         finally:
             os.chdir(cwd)
