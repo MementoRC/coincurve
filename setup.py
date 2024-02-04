@@ -108,15 +108,17 @@ class BuildClibWithCmake(build_clib.build_clib):
         lib_src = os.path.join(cwd, 'libsecp256k1')
 
         install_dir = str(build_temp).replace('temp', 'lib')
-        install_dir = os.path.join(install_dir, 'coincurve')
+        install_bin_dir = os.path.join(install_dir, 'coincurve', 'bin')
+        install_lib_dir = os.path.join(install_dir, 'coincurve')
 
         if not os.path.exists(lib_src):
             # library needs to be downloaded
             self.get_source_files()
 
         cmake_args = [
-            # '-DCMAKE_BUILD_TYPE=Release',
-            f'-DCMAKE_INSTALL_PREFIX={install_dir}',
+            '-DCMAKE_BUILD_TYPE=Release',
+            f'-DCMAKE_PREFIX={install_bin_dir}',
+            f'-DCMAKE_INSTALL_PREFIX={install_lib_dir}',
             '-DBUILD_SHARED_LIBS=ON',
             '-DSECP256K1_BUILD_BENCHMARKS=OFF',
             '-DSECP256K1_BUILD_TESTS=ON',
