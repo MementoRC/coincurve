@@ -157,7 +157,8 @@ class BuildClibWithCmake(build_clib.build_clib):
                 ])
 
         logging.info('    cmake config')
-        execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args], debug=True)
+        execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args])
+        #execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args], debug=True)
 
         try:
             os.chdir(build_temp)
