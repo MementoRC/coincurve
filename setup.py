@@ -115,7 +115,7 @@ class BuildClibWithCmake(build_clib.build_clib):
             self.get_source_files()
 
         cmake_args = [
-            '-DCMAKE_BUILD_TYPE=Release',
+            # '-DCMAKE_BUILD_TYPE=Release',
             f'-DCMAKE_INSTALL_PREFIX={install_dir}',
             '-DBUILD_SHARED_LIBS=ON',
             '-DSECP256K1_BUILD_BENCHMARKS=OFF',
@@ -160,10 +160,10 @@ class BuildClibWithCmake(build_clib.build_clib):
         try:
             os.chdir(build_temp)
             logging.info('    cmake build')
-            execute_command_with_temp_log(['cmake', '--build', '.'], debug=True)
+            execute_command_with_temp_log(['make'], debug=True)
 
             logging.info('    cmake install')
-            execute_command_with_temp_log(['cmake', '--install', '.'], debug=True)
+            execute_command_with_temp_log(['make', 'install'], debug=True)
         finally:
             os.chdir(cwd)
 
