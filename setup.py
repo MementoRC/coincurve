@@ -170,8 +170,8 @@ class BuildClibWithCmake(build_clib.build_clib):
             os.chdir(cwd)
 
         self.pkgconfig_dir = [
-            os.path.join(install_dir, 'lib', 'pkgconfig'),
-            os.path.join(install_dir, 'lib64', 'pkgconfig'),
+            os.path.join(install_lib_dir, 'lib', 'pkgconfig'),
+            os.path.join(install_lib_dir, 'lib64', 'pkgconfig'),
         ]
         os.environ['PKG_CONFIG_PATH'] = f'{":".join(self.pkgconfig_dir)}:{os.environ.get("PKG_CONFIG_PATH", "")}'
 
