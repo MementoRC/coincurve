@@ -178,7 +178,7 @@ class BuildClibWithCmake(build_clib.build_clib):
             f'{str(os.pathsep).join(self.pkgconfig_dir)}'
             f'{os.pathsep}'
             f'{os.environ.get("PKG_CONFIG_PATH", "")}'
-        ).replace("\\", "/")
+        ).replace('\\', '/')
 
         logging.info(f'PKG_CONFIG_PATH: {os.environ["PKG_CONFIG_PATH"]}')
         execute_command_with_temp_log(
