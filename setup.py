@@ -142,6 +142,14 @@ class BuildClibWithCmake(build_clib.build_clib):
                 )
 
         elif os.name == 'nt':
+            def _generator():
+                if '2017' in str(msvc):
+                    return 'Visual Studio 15 2017'
+                if '2019' in str(msvc):
+                    return 'Visual Studio 16 2019'
+                if '2022' in str(msvc):
+                    return 'Visual Studio 17 2022'
+
             vswhere = shutil.which('vswhere')
             msvc = execute_command_with_temp_log(
                 [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\MSBuild.exe'],
@@ -149,10 +157,8 @@ class BuildClibWithCmake(build_clib.build_clib):
             )
             logging.info(f'Using MSVC: {msvc}')
 
-            # For windows, select the correct toolchain file - DO NOT PUT SPACES
-            generator = 'Visual Studio 17 2022' if '2022' in str(msvc) else 'Visual Studio 16 2019'
-            cmake_args.extend(['-G', generator, '-Ax64'])
-            # cmake_args.extend(['-G', 'Visual Studio 17 2022', '-Ax64'])
+            # For windows, select the correct toolchain file
+            cmake_args.extend(['-G', _generator(), '-Ax64'])
 
         logging.info('    cmake config')
         execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args])
@@ -170,6 +176,7 @@ class BuildClibWithCmake(build_clib.build_clib):
         finally:
             os.chdir(cwd)
 
+        # Register lib installation path
         self.pkgconfig_dir = [
             os.path.join(install_lib_dir, 'lib', 'pkgconfig'),
             os.path.join(install_lib_dir, 'lib64', 'pkgconfig'),
@@ -180,11 +187,8 @@ class BuildClibWithCmake(build_clib.build_clib):
             f'{os.environ.get("PKG_CONFIG_PATH", "")}'
         ).replace('\\', '/')
 
-        logging.info(f'PKG_CONFIG_PATH: {os.environ["PKG_CONFIG_PATH"]}')
-        execute_command_with_temp_log(
-            [PKGCONFIG, '--exists', LIB_NAME],
-            debug=True
-        )
+        # Verify installation
+        execute_command_with_temp_log([PKGCONFIG, '--exists', LIB_NAME])
 
         logging.info('build_clib: Done')
 
