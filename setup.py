@@ -146,28 +146,26 @@ class BuildClibWithCmake(build_clib.build_clib):
             msvc = execute_command_with_temp_log(
                 [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\MSBuild.exe'],
                 capture_output=True,
-                debug=True,
             )
             logging.info(f'Using MSVC: {msvc}')
 
             # For windows, select the correct toolchain file - DO NOT PUT SPACES
-            # generator = 'Visual Studio 17 2022' if '2022' in msvc else 'Visual Studio 16 2019'
-            # cmake_args.extend(['-G', generator, '-Ax64'])
-            cmake_args.extend(['-G', 'Visual Studio 17 2022', '-Ax64'])
+            generator = 'Visual Studio 17 2022' if '2022' in msvc else 'Visual Studio 16 2019'
+            cmake_args.extend(['-G', str(generator), '-Ax64'])
+            # cmake_args.extend(['-G', 'Visual Studio 17 2022', '-Ax64'])
 
         logging.info('    cmake config')
         execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args])
 
         try:
             os.chdir(build_temp)
-            logging.info('    cmake build')
-            execute_command_with_temp_log(
-                ['cmake', '--build', '.', '--config', 'Release', '--clean-first'], debug=True)
+            # logging.info('    cmake build')
+            # execute_command_with_temp_log(
+            #     ['cmake', '--build', '.', '--config', 'Release', '--clean-first'])
 
             logging.info('    cmake install')
             execute_command_with_temp_log(
-                ['cmake', '--build', '.', '--target', 'install', '--config', 'Release'],
-                debug=True
+                ['cmake', '--build', '.', '--target', 'install', '--config', 'Release', '--clean-first']
             )
         finally:
             os.chdir(cwd)
@@ -177,9 +175,16 @@ class BuildClibWithCmake(build_clib.build_clib):
             os.path.join(install_lib_dir, 'lib64', 'pkgconfig'),
         ]
         os.environ['PKG_CONFIG_PATH'] = (
-            f'{str(os.pathsep).join(self.pkgconfig_dir)}{os.pathsep}{os.environ.get("PKG_CONFIG_PATH", "")}'
-        )
+            f'{str(os.pathsep).join(self.pkgconfig_dir)}'
+            f'{os.pathsep}'
+            f'{os.environ.get("PKG_CONFIG_PATH", "")}'
+        ).replace("\\", "/")
+
         logging.info(f'PKG_CONFIG_PATH: {os.environ["PKG_CONFIG_PATH"]}')
+        execute_command_with_temp_log(
+            [PKGCONFIG, '--exists', LIB_NAME],
+            debug=True
+        )
 
         logging.info('build_clib: Done')
 
