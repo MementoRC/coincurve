@@ -150,8 +150,8 @@ class BuildClibWithCmake(build_clib.build_clib):
             logging.info(f'Using MSVC: {msvc}')
 
             # For windows, select the correct toolchain file - DO NOT PUT SPACES
-            generator = 'Visual Studio 17 2022' if '2022' in msvc else 'Visual Studio 16 2019'
-            cmake_args.extend(['-G', generator.encode('utf-8'), '-Ax64'])
+            generator = 'Visual Studio 17 2022' if '2022' in msvc.encode('utf-8') else 'Visual Studio 16 2019'
+            cmake_args.extend(['-G', generator, '-Ax64'])
             # cmake_args.extend(['-G', 'Visual Studio 17 2022', '-Ax64'])
 
         logging.info('    cmake config')
