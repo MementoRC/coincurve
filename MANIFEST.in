@@ -1,6 +1,6 @@
 include src/coincurve/py.typed
-recursive-include src/coincurve *.py
 recursive-include setup_modules *.py
 recursive-include _cffi_build *.py *.h
-prune /*
-graft libsecp256k1
+
+# Exclude libsecp256k1
+#prune libsecp256k1

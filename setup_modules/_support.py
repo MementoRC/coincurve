@@ -38,10 +38,10 @@ def redirect(stdchannel, dest_filename):
 
 
 def absolute_from_setup_dir(*paths):
-    from _config import PACKAGE_SETUP_DIR
+    from setup import COINCURVE_ROOT
 
     op = os.path
-    return op.realpath(op.abspath(op.join(PACKAGE_SETUP_DIR, *paths)))
+    return op.realpath(op.abspath(op.join(COINCURVE_ROOT, *paths)))
 
 
 def build_flags(library, type_, path='.'):

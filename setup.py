@@ -12,7 +12,7 @@ PATH.append(COINCURVE_ROOT)
 PATH.insert(0, join(COINCURVE_ROOT, 'setup_modules'))
 from _build_c_library import BuildClibWithCmake, BuildClib  # noqa
 from _build_cffi_extension import BuildCFFIForSharedLib  # noqa
-from _custom_commands import EggInfo, Sdist, Develop, BdistWheel  # noqa
+from _custom_commands import Develop, BdistWheel  # noqa
 from _support import detect_dll, has_system_lib  # noqa
 
 # IMPORTANT: keep in sync with .github/workflows/build.yml
@@ -28,18 +28,20 @@ LIB_NAME = 'libsecp256k1'
 
 BUILDING_FOR_WINDOWS = detect_dll()
 
-__version__ = None
-
 
 def main():
     extension = Extension(
-        name=f'_{LIB_NAME}',
-        sources=[join('src/coincurve', f'_{LIB_NAME}.c')],
+        name=f'coincurve._{LIB_NAME}',
+        # This is necessary to define the Extension. The build process creates these files.
+        # Their name is not critical, but it must be unique.
+        sources=[f'_{LIB_NAME}.c'],
         py_limited_api=False,
     )
 
+    globals_ = {}
     with open(join(COINCURVE_ROOT, 'src', 'coincurve', '_version.py')) as fp:
-        exec(fp.read())  # noqa S102
+        exec(fp.read(), globals_)  # noqa S102
+        __version__ = globals_['__version__']
 
     if has_system_lib():
 
@@ -55,8 +57,6 @@ def main():
                 'build_clib': BuildClib,
                 'build_ext': BuildCFFIForSharedLib,
                 'develop': Develop,
-                'egg_info': EggInfo,
-                'sdist': Sdist,
                 'bdist_wheel': BdistWheel,
             },
         )
@@ -82,18 +82,15 @@ def main():
                 cmdclass={
                     'build_clib': BuildClibWithCmake,
                     'build_ext': BuildCFFIForSharedLib,
-                    'develop': Develop,
-                    'egg_info': EggInfo,
-                    'sdist': Sdist,
+                    # 'develop': Develop,
                     'bdist_wheel': BdistWheel,
                 },
             )
 
     setup(
-        name='coincurve',
-        # version=__version__,
+        version=__version__,
 
-        package_dir={'': 'src'},
+        package_dir={'coincurve': 'src/coincurve'},
 
         distclass=Distribution,
         zip_safe=False,

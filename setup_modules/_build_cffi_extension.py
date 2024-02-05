@@ -40,14 +40,24 @@ class _BuildExtensionFromCFFI(build_ext.build_ext):
 
 class _BuildCFFI(_BuildExtensionFromCFFI):
     def build_extension(self, ext):
-        logging.info(f'Cmdline CFFI build:' f'\n     Source: {absolute_from_setup_dir(ext.sources[0])}')
+        logging.info(f'Cmdline CFFI build:' f'\n     C-file target: {ext.sources[0]}')
 
-        build_script = os.path.join('_cffi_build', 'build.py')
-        for c_file in ext.sources:
+        build_script = absolute_from_setup_dir(os.path.join('_cffi_build', 'build.py'))
+
+        build_dir = os.path.join(self.build_temp, 'cffi_build')
+        os.makedirs(build_dir, exist_ok=True)
+        for i, c_file in enumerate(ext.sources):
+            # Extract filename from path
+            c_file = os.path.join(build_dir, os.path.basename(c_file))
             cmd = [sys.executable, build_script, c_file, '1' if self.static_lib else '0']
             execute_command_with_temp_log(cmd)
 
+            # Update the location of the C-file (built in the temp dir) for it compilation
+            # in the next step of the Extension build
+            ext.sources[i] = c_file
+
         super().build_extension(ext)
+        logging.info('   CFFI C-file build: Done')
 
 
 class BuildCFFIForSharedLib(_BuildCFFI):

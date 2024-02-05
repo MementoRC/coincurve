@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "coincurve"
-version = "19.0.0"
 authors = [
   { name="Ofek Lev", email="oss@ofek.dev" },
 ]
@@ -35,6 +34,7 @@ classifiers = [
     'Topic :: Software Development :: Libraries',
     'Topic :: Security :: Cryptography',
 ]
+dynamic = ["version"]
 
 [project.urls]
 "Homepage" = "https://github.com/ofek/coincurve"

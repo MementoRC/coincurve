@@ -20,12 +20,8 @@ class BuildClibWithCmake(build_clib.build_clib):
         self.pkgconfig_dir = None
 
     def get_source_files(self):
-        # Ensure library has been downloaded (sdist might have been skipped)
-        if not has_system_lib():
-            download_library(self)
-
-        # This seems to create issues in MANIFEST.in
-        return [f for _, _, fs in os.walk(absolute_from_setup_dir('libsecp256k1')) for f in fs]
+        # We don't provideSECP256K1 since we provide a mean to download it
+        return []
 
     def run(self):
         if has_system_lib():
@@ -45,7 +41,7 @@ class BuildClibWithCmake(build_clib.build_clib):
 
         if not os.path.exists(lib_src):
             # library needs to be downloaded
-            self.get_source_files()
+            download_library(self)
 
         cmake_args = [
             '-DCMAKE_BUILD_TYPE=Release',
