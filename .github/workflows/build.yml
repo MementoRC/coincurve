@@ -170,24 +170,24 @@ jobs:
       run: |
         Get-ChildItem -Recurse -Filter *.egg-info | Remove-Item -Force
 
-    - uses: conda-incubator/setup-miniconda@11b562958363ec5770fef326fe8ef0366f8cbf8a # v3.0.1
-      with:
-        auto-update-conda: true
-        python-version: "3.12"
+    # - uses: conda-incubator/setup-miniconda@11b562958363ec5770fef326fe8ef0366f8cbf8a # v3.0.1
+    #   with:
+    #     auto-update-conda: true
+    #     python-version: "3.12"
 
-    - name: Install build dependencies
-      run: |
-        conda install -y cmake>=3.26
-      # conda install -y cmake>=3.26 m2-autoconf m2-automake-wrapper m2-base m2-bash m2-libtool m2-m4 m2-gzip m2-make m2-sed m2-tar pkg-config
+    # - name: Install build dependencies
+    #   run: |
+    #     conda install -y cmake>=3.26
+    #   # conda install -y cmake>=3.26 m2-autoconf m2-automake-wrapper m2-base m2-bash m2-libtool m2-m4 m2-gzip m2-make m2-sed m2-tar pkg-config
 
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
       env:
-        # CIBW_BEFORE_ALL: choco install -y --no-progress --no-color msys2 pkgconfiglite
+        CIBW_BEFORE_ALL: choco install -y --no-progress --no-color cmake pkgconfiglite
         # CIBW_BEFORE_TEST_WINDOWS: bash {project}/.github/scripts/build-minimal-windows-image.sh 312
         CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: bash {project}/.github/repair-windows-wheels.sh {wheel} {dest_dir}
         CIBW_TEST_COMMAND_WINDOWS: bash {project}/.github/scripts/test-windows-wheels.sh 312
-        CIBW_TEST_REQUIRES: pytest pytest-benchmark
+        CIBW_TEST_REQUIRES: pytest pytest-benchmark cmake>=3.26
         CIBW_TEST_COMMAND: python -m pytest {project}/tests
 
     - uses: actions/upload-artifact@v3

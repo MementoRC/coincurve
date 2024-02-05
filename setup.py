@@ -151,13 +151,12 @@ class BuildClibWithCmake(build_clib.build_clib):
             logging.info(f'Using MSVC: {msvc}')
 
             # For windows, select the correct toolchain file - DO NOT PUT SPACES
-            # generator = 'Visual Studio 17 2022' if '2022' in msvc else 'Visual Studio 16 2019'
-            # cmake_args.extend(['-G', generator, '-Ax64'])
-            cmake_args.extend(['-G', 'Visual Studio 17 2022', '-Ax64'])
+            generator = 'Visual Studio 17 2022' if '2022' in msvc else 'Visual Studio 16 2019'
+            cmake_args.extend(['-G', generator, '-Ax64'])
+            # cmake_args.extend(['-G', 'Visual Studio 17 2022', '-Ax64'])
 
         logging.info('    cmake config')
         execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args])
-        #execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args], debug=True)
 
         try:
             os.chdir(build_temp)
@@ -170,9 +169,6 @@ class BuildClibWithCmake(build_clib.build_clib):
                 ['cmake', '--build', '.', '--target', 'install', '--config', 'Release'],
                 debug=True
             )
-            # if os.name == 'nt':
-            # else:
-            #     execute_command_with_temp_log(['cmake', '--install', '.', '--verbose'], debug=True)
         finally:
             os.chdir(cwd)
 
@@ -181,8 +177,9 @@ class BuildClibWithCmake(build_clib.build_clib):
             os.path.join(install_lib_dir, 'lib64', 'pkgconfig'),
         ]
         os.environ['PKG_CONFIG_PATH'] = (
-            f'{os.pathsep.join(self.pkgconfig_dir)}{os.pathsep}{os.environ.get("PKG_CONFIG_PATH", "")}'
+            f'{str(os.pathsep).join(self.pkgconfig_dir)}{os.pathsep}{os.environ.get("PKG_CONFIG_PATH", "")}'
         )
+        logging.info(f'PKG_CONFIG_PATH: {os.environ["PKG_CONFIG_PATH"]}')
 
         logging.info('build_clib: Done')
 
