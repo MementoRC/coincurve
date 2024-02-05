@@ -334,9 +334,9 @@ class BuildCFFIForSharedLib(_BuildCFFI):
                     '-Wl,-rpath,$ORIGIN/lib64',
                 ])
         elif self.compiler.__class__.__name__ == 'MSVCCompiler':
-            extra_link_args.extend([
-                f'"/LIBPATH:{lib_dir}"' for lib_dir in libraries_dirs
-            ])
+            for ld in libraries:
+                ld = ld.replace('/', '\\')
+                extra_link_args.append([f'/LIBPATH:{ld}'])
             extra_link_args.extend([f'lib{lib}' for lib in libraries])
         else:
             raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
