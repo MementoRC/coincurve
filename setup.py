@@ -163,16 +163,16 @@ class BuildClibWithCmake(build_clib.build_clib):
             os.chdir(build_temp)
             logging.info('    cmake build')
             execute_command_with_temp_log(
-                ['cmake', '--build', '.'], debug=True)
+                ['cmake', '--build', '.', '--config', 'Release', '--clean-first'], debug=True)
 
             logging.info('    cmake install')
-            if os.name == 'nt':
-                execute_command_with_temp_log(
-                    ['cmake', '--build', '.', '--target', 'install', 'CMAKE_BUILD_TYPE=Release'],
-                    debug=True
-                )
-            else:
-                execute_command_with_temp_log(['cmake', '--install', '.', '--verbose'], debug=True)
+            execute_command_with_temp_log(
+                ['cmake', '--build', '.', '--target', 'install', '--config', 'Release'],
+                debug=True
+            )
+            # if os.name == 'nt':
+            # else:
+            #     execute_command_with_temp_log(['cmake', '--install', '.', '--verbose'], debug=True)
         finally:
             os.chdir(cwd)
 
