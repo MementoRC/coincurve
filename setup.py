@@ -325,9 +325,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
         if self.compiler.__class__.__name__ == 'UnixCCompiler':
             extra_link_args.extend([f'-l{lib}' for lib in libraries])
             if sys.platform == 'darwin':
-                # It seems that the syntax may be: -Wl,-rpath,@loader_path/lib
                 extra_link_args.extend([
-                    # f'-Wl,-rpath,{self.build_lib}/lib',
                     '-Wl,-rpath,@loader_path/lib',
                 ])
             else:
@@ -336,7 +334,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
                     '-Wl,-rpath,$ORIGIN/lib64',
                 ])
         elif self.compiler.__class__.__name__ == 'MSVCCompiler':
-            logging.info(f'update_link_args: MSVCCompiler')
+            logging.info('update_link_args: MSVCCompiler')
         else:
             raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
 
