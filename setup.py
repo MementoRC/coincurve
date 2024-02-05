@@ -165,9 +165,6 @@ class BuildClibWithCmake(build_clib.build_clib):
 
         try:
             os.chdir(build_temp)
-            # logging.info('    cmake build')
-            # execute_command_with_temp_log(
-            #     ['cmake', '--build', '.', '--config', 'Release', '--clean-first'])
 
             logging.info('    cmake install')
             execute_command_with_temp_log(
@@ -339,9 +336,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
                     '-Wl,-rpath,$ORIGIN/lib64',
                 ])
         elif self.compiler.__class__.__name__ == 'MSVCCompiler':
-            # This section is not used yet since we still cross-compile on Windows
-            # TODO: write the windows native build here when finalized
-            raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
+            logging.info(f'update_link_args: MSVCCompiler')
         else:
             raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
 
