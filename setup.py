@@ -337,7 +337,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
             logging.info(libraries)
             logging.info(libraries_dirs,)
             extra_link_args.extend([
-                f'/LIBPATH:{lib_dir}' for lib_dir in libraries_dirs if (lib_dir := lib_dir.replace('\\', '/'))
+                f'/LIBPATH:{lib_dir}' for lib_dir in libraries_dirs
             ])
         else:
             raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
