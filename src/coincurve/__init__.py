@@ -1,4 +1,3 @@
-from coincurve._version import __version__
 from coincurve.context import GLOBAL_CONTEXT, Context
 from coincurve.keys import PrivateKey, PublicKey, PublicKeyXOnly
 from coincurve.utils import verify_signature
@@ -12,3 +11,5 @@ __all__ = [
     'verify_signature',
     '__version__',
 ]
+
+from ._version import __version__

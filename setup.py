@@ -49,7 +49,6 @@ def main():
             def has_c_libraries(self):
                 return not has_system_lib()
 
-        # TODO: This has not been tested yet. has_system_lib() does not find conda install lib yet
         setup_kwargs = dict(
             setup_requires=['cffi>=1.3.0', 'requests'],
             ext_modules=[extension],
