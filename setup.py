@@ -334,7 +334,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
                     '-Wl,-rpath,$ORIGIN/lib64',
                 ])
         elif self.compiler.__class__.__name__ == 'MSVCCompiler':
-            for ld in libraries:
+            for ld in libraries_dirs:
                 ld = ld.replace('/', '\\')
                 extra_link_args.append(f'/LIBPATH:{ld}')
             extra_link_args.extend([f'lib{lib}' for lib in libraries])
