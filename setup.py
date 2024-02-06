@@ -341,15 +341,19 @@ class BuildCFFIForSharedLib(_BuildCFFI):
         elif self.compiler.__class__.__name__ == 'MSVCCompiler':
 
             vswhere = shutil.which('vswhere')
-            msvc = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\dumpbin.exe'],
+            dumpbin = execute_command_with_temp_log(
+                [vswhere, '-latest', '-find', '**\\dumpbin.exe'],
                 capture_output=True,
             )
-            logging.info(f'Using dumpin: {msvc}')
+            logging.info(f'Using dumpin: {dumpbin}')
 
             for ld in libraries_dirs:
                 ld = ld.replace('/', '\\')
                 extra_link_args.append(f'/LIBPATH:{ld}')
+                dumpbin = execute_command_with_temp_log(
+                    [dumpbin, '/exports', '/out:exports.txt', f'{ld}\\lib{libraries[0]}.lib', '/nologo'],
+                    capture_output=True,
+                )
             extra_link_args.extend([f'lib{lib}.lib' for lib in libraries])
         else:
             raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
