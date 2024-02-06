@@ -337,7 +337,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
             for ld in libraries_dirs:
                 ld = ld.replace('/', '\\')
                 extra_link_args.append(f'/LIBPATH:{ld}')
-            extra_link_args.extend([f'lib{lib}' for lib in libraries])
+            extra_link_args.extend([f'lib{lib}.lib' for lib in libraries])
         else:
             raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
 
