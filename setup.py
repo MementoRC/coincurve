@@ -312,8 +312,10 @@ class _BuildCFFI(_BuildExtensionFromCFFI):
 
         build_script = os.path.join('_cffi_build', 'build.py')
         for c_file in ext.sources:
+            logging.info(f'     Static: {self.static_lib}')
             cmd = [sys.executable, build_script, c_file, '1' if self.static_lib else '0']
-            execute_command_with_temp_log(cmd)
+            logging.info(f'        CMD: {cmd}')
+            execute_command_with_temp_log(cmd, debug=True)
 
         super().build_extension(ext)
 
@@ -334,6 +336,14 @@ class BuildCFFIForSharedLib(_BuildCFFI):
                     '-Wl,-rpath,$ORIGIN/lib64',
                 ])
         elif self.compiler.__class__.__name__ == 'MSVCCompiler':
+
+            vswhere = shutil.which('vswhere')
+            msvc = execute_command_with_temp_log(
+                [vswhere, '-latest', '-find', 'dumpbin.exe'],
+                capture_output=True,
+            )
+            logging.info(f'Using dumpin: {msvc}')
+
             for ld in libraries_dirs:
                 ld = ld.replace('/', '\\')
                 extra_link_args.append(f'/LIBPATH:{ld}')

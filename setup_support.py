@@ -59,8 +59,11 @@ def build_flags(library, type_, path='.'):
 
     options = {'I': '--cflags-only-I', 'L': '--libs-only-L', 'l': '--libs-only-l'}
     env = dict(os.environ, PKG_CONFIG_PATH=str(os.pathsep).join(pkg_config_path))
-    flags = subprocess.check_output([PKGCONFIG, options[type_], library], env=env)  # noqa S603
-    flags = list(flags.decode('UTF-8').split())
+    try:
+        flags = execute_command_with_temp_log([PKGCONFIG, options[type_], library], env=env, capture_output=True)
+        flags = list(flags.decode('UTF-8').split())
+    except subprocess.CalledProcessError as e:
+        raise SystemExit(f'Required SECP256K1 library not found: {e!s}') from e
 
     return [flag.strip(f'-{type_}') for flag in flags]
 
@@ -184,13 +187,13 @@ def _download_library(lib_dir=None):
     os.remove(f'{UPSTREAM_REF}.tar.gz')
 
 
-def execute_command_with_temp_log(cmd, debug=False, capture_output=False):
+def execute_command_with_temp_log(cmd, *, debug=False, capture_output=False, **kwargs):
     with tempfile.NamedTemporaryFile(mode='w+') as temp_log:
         try:
             if capture_output:
-                ret = subprocess.check_output(cmd, stderr=temp_log)  # noqa S603
+                ret = subprocess.check_output(cmd, stderr=temp_log, **kwargs)  # noqa S603
             else:
-                subprocess.check_call(cmd, stdout=temp_log, stderr=temp_log)  # noqa S603
+                subprocess.check_call(cmd, stdout=temp_log, stderr=temp_log, **kwargs)  # noqa S603
 
             if debug:
                 temp_log.seek(0)
