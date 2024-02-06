@@ -198,7 +198,6 @@ class BuildClibWithCmake(build_clib.build_clib):
             )
             logging.info(f'DLL content: {export}')
 
-
         logging.info('build_clib: Done')
 
 
