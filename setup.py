@@ -187,6 +187,17 @@ class BuildClibWithCmake(build_clib.build_clib):
         # Verify installation
         execute_command_with_temp_log([PKGCONFIG, '--exists', LIB_NAME])
 
+        dumpbin = execute_command_with_temp_log(
+            [vswhere, '-latest', '-find', '\\VC\\bin\\dumpbin.exe'],
+            capture_output=True,
+        )
+        export = execute_command_with_temp_log(
+            [dumpbin, '/exports', f'{install_lib_dir}\\lib{LIB_NAME}.dll', '/nologo'],
+            capture_output=True,
+        )
+        logging.info(f'DLL content: {export}')
+
+
         logging.info('build_clib: Done')
 
 
@@ -342,7 +353,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
 
             vswhere = shutil.which('vswhere')
             dumpbin = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', '**\\dumpbin.exe'],
+                [vswhere, '-latest', '-find', '\\VC\\bin\\dumpbin.exe'],
                 capture_output=True,
             )
             logging.info(f'Using dumpin: {dumpbin}')
