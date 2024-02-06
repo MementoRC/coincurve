@@ -16,7 +16,7 @@ from coincurve.utils import (
     validate_secret,
     verify_signature,
 )
-from tests.samples import MESSAGE, PRIVATE_KEY_DER, PUBLIC_KEY_COMPRESSED, PUBLIC_KEY_UNCOMPRESSED, SIGNATURE
+from .samples import MESSAGE, PRIVATE_KEY_DER, PUBLIC_KEY_COMPRESSED, PUBLIC_KEY_UNCOMPRESSED, SIGNATURE
 
 
 class TestPadScalar:
