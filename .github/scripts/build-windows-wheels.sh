@@ -35,7 +35,7 @@ rm src/coincurve/libsecp256k1.dll
 cd ../32bit
 build_dll i686-w64-mingw32
 # Not sure why it ended-up being a -2.dll instead of -0.dll: Researching
-mv .libs/libsecp256k1-?.dll ../clean/coincurve/libsecp256k1.dll
+mv .libs/libsecp256k1-?.dll ../clean/src/coincurve/libsecp256k1.dll
 cd ../clean
 python setup.py bdist_wheel --plat-name=win32
 
