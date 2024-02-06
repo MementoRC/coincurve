@@ -342,7 +342,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
 
             vswhere = shutil.which('vswhere')
             msvc = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', 'dumpbin.exe'],
+                [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\dumpbin.exe'],
                 capture_output=True,
             )
             logging.info(f'Using dumpin: {msvc}')
