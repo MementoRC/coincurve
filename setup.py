@@ -289,11 +289,14 @@ class _BuildExtensionFromCFFI(build_ext.build_ext):
         # Enforce API interface
         ext.py_limited_api = False
 
-        # PKG_CONFIG_PATH is updated by build_clib if built locally
-        ext.include_dirs.extend(build_flags('libsecp256k1', 'I'))
-        ext.library_dirs.extend(build_flags('libsecp256k1', 'L'))
+        # Location of locally built library
+        c_lib_pkg = os.path.join(self.build_lib, 'coincurve', 'lib', 'pkgconfig')
 
-        libraries = build_flags('libsecp256k1', 'l')
+        # PKG_CONFIG_PATH is updated by build_clib if built locally
+        ext.include_dirs.extend(build_flags('libsecp256k1', 'I', c_lib_pkg))
+        ext.library_dirs.extend(build_flags('libsecp256k1', 'L', c_lib_pkg))
+
+        libraries = build_flags('libsecp256k1', 'l', c_lib_pkg)
         logging.info(f'  Libraries:{libraries}')
 
         # We do not set ext.libraries, this would add the default link instruction
