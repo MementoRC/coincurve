@@ -58,7 +58,7 @@ def mk_ffi(sources: List[Source],
     :return: An FFI object.
     """
     _ffi = FFI()
-    code = []  # [define_static_lib] if static_lib else [define_shared_lib]
+    code = [define_static_lib]  # [define_static_lib] if static_lib else [define_shared_lib]
 
     logging.info(f'   Static {static_lib}...')
     for source in sources:
