@@ -192,12 +192,14 @@ class BuildClibWithCmake(build_clib.build_clib):
                 [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
                 capture_output=True,
             )
+            dumpbin = dumpbin.decode('UTF-8').strip()
             logging.info(f'Using dumpbin: {dumpbin}')
 
             link = execute_command_with_temp_log(
                 [vswhere, '-latest', '-find', '**\\bin\\link.exe'],
                 capture_output=True,
             )
+            link = link.decode('UTF-8').strip()
             logging.info(f'Using link: {link}')
 
             lib_file = os.path.join(install_lib_dir, 'lib', f'{LIB_NAME}.lib')
@@ -206,6 +208,7 @@ class BuildClibWithCmake(build_clib.build_clib):
                 [link, '/dump', '/all', f'{lib_file}'],
                 capture_output=True,
             )
+            export = export.decode('UTF-8').split('\n')
             logging.info(f'LIB content: {export}')
 
             dll_file = os.path.join(install_lib_dir, 'bin', f'{LIB_NAME}.dll')
@@ -214,6 +217,7 @@ class BuildClibWithCmake(build_clib.build_clib):
                 [dumpbin, '/exports', f'{dll_file}'],
                 capture_output=True,
             )
+            export = export.decode('UTF-8').split('\n')
             logging.info(f'DLL content: {export}')
 
         logging.info('build_clib: Done')
@@ -371,7 +375,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
 
             vswhere = shutil.which('vswhere')
             dumpbin = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', '\\VC\\bin\\dumpbin.exe'],
+                [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
                 capture_output=True,
             )
             logging.info(f'Using dumpin: {dumpbin}')
@@ -380,7 +384,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
                 ld = ld.replace('/', '\\')
                 extra_link_args.append(f'/LIBPATH:{ld}')
                 dumpbin = execute_command_with_temp_log(
-                    [dumpbin, '/exports', '/out:exports.txt', f'{ld}\\lib{libraries[0]}.lib', '/nologo'],
+                    [dumpbin, '/exports', '/out:exports.txt', f'{ld}\\lib{libraries[0]}.lib'],
                     capture_output=True,
                 )
             extra_link_args.extend([f'lib{lib}.lib' for lib in libraries])
