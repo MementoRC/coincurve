@@ -213,7 +213,7 @@ class BuildClibWithCmake(build_clib.build_clib):
             export = export.decode('utf-8', errors='ignore').split('\n')
             logging.info(f'LIB content: {export}')
 
-            dll_file = os.path.join(install_lib_dir, 'lib', f'{LIB_NAME}.dll')
+            dll_file = os.path.join(install_lib_dir, 'bin', f'{LIB_NAME}-2.dll')
             logging.info(f'    DLL: {dll_file}:{os.path.isfile(dll_file)}')
             export = execute_command_with_temp_log(
                 [dumpbin, '/exports', f'{dll_file}'],
