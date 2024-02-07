@@ -6,6 +6,7 @@ import platform
 import shutil
 import sys
 
+import chardet
 from setuptools import Distribution as _Distribution, setup, find_packages
 from setuptools.command import build_clib, build_ext, develop, dist_info, egg_info, sdist
 from setuptools.extension import Extension
@@ -192,14 +193,15 @@ class BuildClibWithCmake(build_clib.build_clib):
                 [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
                 capture_output=True,
             )
-            dumpbin = dumpbin.decode('UTF-8').strip()
+            detected_encoding = chardet.detect(dumpbin)['encoding']
+            dumpbin = dumpbin.decode(detected_encoding).strip()
             logging.info(f'Using dumpbin: {dumpbin}')
 
             link = execute_command_with_temp_log(
                 [vswhere, '-latest', '-find', '**\\bin\\link.exe'],
                 capture_output=True,
             )
-            link = link.decode('UTF-8').strip()
+            link = link.decode(detected_encoding).strip()
             logging.info(f'Using link: {link}')
 
             lib_file = os.path.join(install_lib_dir, 'lib', f'{LIB_NAME}.lib')
@@ -208,7 +210,7 @@ class BuildClibWithCmake(build_clib.build_clib):
                 [link, '/dump', '/all', f'{lib_file}'],
                 capture_output=True,
             )
-            export = export.decode('UTF-8').split('\n')
+            export = export.decode(detected_encoding).split('\n')
             logging.info(f'LIB content: {export}')
 
             dll_file = os.path.join(install_lib_dir, 'bin', f'{LIB_NAME}.dll')
@@ -217,7 +219,7 @@ class BuildClibWithCmake(build_clib.build_clib):
                 [dumpbin, '/exports', f'{dll_file}'],
                 capture_output=True,
             )
-            export = export.decode('UTF-8').split('\n')
+            export = export.decode(detected_encoding).split('\n')
             logging.info(f'DLL content: {export}')
 
         logging.info('build_clib: Done')
