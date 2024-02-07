@@ -196,13 +196,14 @@ class BuildClibWithCmake(build_clib.build_clib):
                 [vswhere, '-latest', '-find', '\\VC\\bin\\link.exe'],
                 capture_output=True,
             )
+
             export = execute_command_with_temp_log(
-                [dumpbin, '/exports', f'{install_bin_dir}\\lib{LIB_NAME}.dll', '/nologo'],
+                [link, '/dump', '/all', f'{install_lib_dir}\\lib{LIB_NAME}.lib'],
                 capture_output=True,
             )
             logging.info(f'DLL content: {export}')
             export = execute_command_with_temp_log(
-                [link, '/dump', '/all', f'{install_lib_dir}\\lib{LIB_NAME}.lib', '/nologo'],
+                [dumpbin, '/exports', f'{install_bin_dir}\\lib{LIB_NAME}.dll'],
                 capture_output=True,
             )
             logging.info(f'DLL content: {export}')
