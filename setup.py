@@ -87,6 +87,9 @@ def main():
             )
 
     setup(
+        # Still needed for windows cross-compiled install that calls setup.py
+        name='coincurve',
+
         version=__version__,
 
         package_dir={'coincurve': 'src/coincurve'},
