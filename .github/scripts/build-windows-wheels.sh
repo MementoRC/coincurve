@@ -39,5 +39,5 @@ mv .libs/libsecp256k1-?.dll ../clean/src/coincurve/libsecp256k1.dll
 cd ../clean
 python setup.py bdist_wheel --plat-name=win32
 
-mv dist ../coincurve
+mv dist/* ../coincurve/dist
 cd ../coincurve
