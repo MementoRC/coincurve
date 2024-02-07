@@ -189,17 +189,24 @@ class BuildClibWithCmake(build_clib.build_clib):
 
         if os.name == 'nt':
             dumpbin = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', '\\VC\\bin\\dumpbin.exe'],
+                [vswhere, '-latest', '-find', '**\\dumpbin.exe'],
                 capture_output=True,
             )
+            logging.info(f'Using dumpbin: {dumpbin}')
+
+            dumpbin = execute_command_with_temp_log(
+                [vswhere, '-latest', '-find', 'Bin\\dumpbin.exe'],
+                capture_output=True,
+            )
+            logging.info(f'Using dumpbin: {dumpbin}')
+
             link = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', '\\VC\\bin\\link.exe'],
+                [vswhere, '-latest', '-find', 'Bin\\link.exe'],
                 capture_output=True,
             )
-            logging.info(f'Using dumpin: {dumpbin}')
             logging.info(f'Using link: {link}')
 
-            lib_file = f'{install_lib_dir}\\lib{LIB_NAME}'
+            lib_file = f'{install_lib_dir}\\{LIB_NAME}.lib'
             logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
             export = execute_command_with_temp_log(
                 [link, '/dump', '/all', f'{lib_file}'],
@@ -207,7 +214,7 @@ class BuildClibWithCmake(build_clib.build_clib):
             )
             logging.info(f'LIB content: {export}')
 
-            dll_file = f'{install_bin_dir}\\lib{LIB_NAME}.dll'
+            dll_file = f'{install_bin_dir}\\{LIB_NAME}.dll'
             logging.info(f'    DLL: {dll_file}:{os.path.isfile(dll_file)}')
             export = execute_command_with_temp_log(
                 [dumpbin, '/exports', f'{dll_file}'],
