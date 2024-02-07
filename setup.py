@@ -108,7 +108,7 @@ class BuildClibWithCmake(build_clib.build_clib):
         lib_src = os.path.join(cwd, 'libsecp256k1')
 
         install_dir = str(build_temp).replace('temp', 'lib')
-        install_bin_dir = os.path.join(install_dir, 'coincurve', 'bin')
+        # install_bin_dir = os.path.join(install_dir, 'coincurve', 'bin')
         install_lib_dir = os.path.join(install_dir, 'coincurve')
 
         if not os.path.exists(lib_src):
@@ -117,7 +117,7 @@ class BuildClibWithCmake(build_clib.build_clib):
 
         cmake_args = [
             '-DCMAKE_BUILD_TYPE=Release',
-            f'-DCMAKE_PREFIX={install_bin_dir}',
+            # f'-DCMAKE_PREFIX={install_lib_dir}',
             f'-DCMAKE_INSTALL_PREFIX={install_lib_dir}',
             '-DBUILD_SHARED_LIBS=ON',
             '-DSECP256K1_BUILD_BENCHMARKS=OFF',
@@ -168,7 +168,8 @@ class BuildClibWithCmake(build_clib.build_clib):
 
             logging.info('    cmake install')
             execute_command_with_temp_log(
-                ['cmake', '--build', '.', '--target', 'install', '--config', 'Release', '--clean-first']
+                ['cmake', '--build', '.', '--target', 'install', '--config', 'Release', '--clean-first'],
+                debug=True,
             )
         finally:
             os.chdir(cwd)
@@ -212,7 +213,7 @@ class BuildClibWithCmake(build_clib.build_clib):
             export = export.decode('utf-8', errors='ignore').split('\n')
             logging.info(f'LIB content: {export}')
 
-            dll_file = os.path.join(install_lib_dir, 'bin', f'{LIB_NAME}.dll')
+            dll_file = os.path.join(install_lib_dir, 'lib', f'{LIB_NAME}.dll')
             logging.info(f'    DLL: {dll_file}:{os.path.isfile(dll_file)}')
             export = execute_command_with_temp_log(
                 [dumpbin, '/exports', f'{dll_file}'],
