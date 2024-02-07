@@ -195,13 +195,13 @@ class BuildClibWithCmake(build_clib.build_clib):
             logging.info(f'Using dumpbin: {dumpbin}')
 
             dumpbin = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', 'Bin\\dumpbin.exe'],
+                [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
                 capture_output=True,
             )
             logging.info(f'Using dumpbin: {dumpbin}')
 
             link = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', 'Bin\\link.exe'],
+                [vswhere, '-latest', '-find', '**\\bin\\link.exe'],
                 capture_output=True,
             )
             logging.info(f'Using link: {link}')
