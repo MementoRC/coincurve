@@ -83,7 +83,7 @@ jobs:
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.2
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: artifacts
         path: wheelhouse/*.whl
@@ -103,7 +103,7 @@ jobs:
       env:
         CIBW_ARCHS_MACOS: x86_64
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: artifacts
         path: wheelhouse/*.whl
@@ -125,7 +125,7 @@ jobs:
         COINCURVE_CROSS_HOST: aarch64-apple-darwin
         CFLAGS: -target arm64-apple-macos11
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: artifacts
         path: wheelhouse/*.whl
@@ -149,7 +149,7 @@ jobs:
     - name: Build Windows wheels
       run: ./.github/scripts/build-windows-wheels.sh
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: artifacts
         path: dist/*
@@ -178,7 +178,7 @@ jobs:
       env:
         CIBW_ARCHS_LINUX: aarch64
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: artifacts
         path: wheelhouse/*.whl
