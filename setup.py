@@ -389,7 +389,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
                     if os.path.exists(lib_file):
                         logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
                         dumpbin = execute_command_with_temp_log(
-                            [dumpbin, '/exports', lib_file],
+                            [dumpbin, '-exports', lib_file],
                             capture_output=True,
                         )
                         extra_link_args.append(lib_file)
