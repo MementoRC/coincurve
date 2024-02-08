@@ -427,9 +427,26 @@ class BuildCFFIForStaticLib(_BuildCFFI):
                     extra_link_args.extend(['-Wl,-Bstatic', f'-l{lib}', '-Wl,-Bdynamic'])
 
         elif self.compiler.__class__.__name__ == 'MSVCCompiler':
-            # This section is not used yet since we still cross-compile on Windows
-            # TODO: write the windows native build here when finalized
-            raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
+            vswhere = shutil.which('vswhere')
+            dumpbin = execute_command_with_temp_log(
+                [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
+                capture_output=True,
+            )
+            dumpbin = dumpbin.decode('utf-8', errors='ignore').strip()
+            logging.info(f'Using dumpin: {dumpbin}')
+
+            for ld in libraries_dirs:
+                ld = ld.replace('/', '\\')
+                for lib in libraries:
+                    lib_file = os.path.join(ld, f'lib{lib}.lib')
+                    if os.path.exists(lib_file):
+                        logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
+                        export = execute_command_with_temp_log(
+                            [dumpbin, '-exports', lib_file],
+                            capture_output=True,
+                        )
+                        logging.info(f'exports: {export}')
+                        extra_link_args.append(lib_file)
         else:
             raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
 
@@ -486,7 +503,7 @@ else:
             ext_modules=[extension],
             cmdclass={
                 'build_clib': BuildClibWithCmake,
-                'build_ext': BuildCFFIForSharedLib,
+                'build_ext': BuildCFFIForStaticLib,
                 'develop': Develop,
                 'egg_info': EggInfo,
                 'sdist': Sdist,
