@@ -385,8 +385,10 @@ class BuildCFFIForSharedLib(_BuildCFFI):
             for ld in libraries_dirs:
                 ld = ld.replace('/', '\\')
                 extra_link_args.append(f'/LIBPATH:{ld}')
+                lib_file = os.path.join(ld, f'lib{libraries[0]}.lib')
+                logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
                 dumpbin = execute_command_with_temp_log(
-                    [dumpbin, '/exports', '/out:exports.txt', f'{ld}\\lib{libraries[0]}.lib'],
+                    [dumpbin, '/exports', f'{ld}\\lib{libraries[0]}.lib'],
                     capture_output=True,
                 )
             extra_link_args.extend([f'lib{lib}.lib' for lib in libraries])
