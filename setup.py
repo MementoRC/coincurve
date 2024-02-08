@@ -36,7 +36,9 @@ LIB_TARBALL_HASH = f'{UPSTREAM_HSH}'
 
 TAR_NAME = f'secp256k1-{UPSTREAM_REF}'
 LIB_NAME = 'libsecp256k1'
+PKG_NAME = 'coincurve'
 
+_SECP256K1_BUILD_TYPE = 'STATIC'
 
 class EggInfo(egg_info.egg_info):
     def run(self):
@@ -81,6 +83,73 @@ if _bdist_wheel:
             super().run()
 
 
+class _BuildClib(build_clib.build_clib):
+    title = 'SECP256K1 C library build'
+
+    def __init__(self, dist):
+        super().__init__(dist)
+        self.pkgconfig_dir = None
+
+        self._cwd = None
+        self._lib_src = None
+        self._install_dir = str(self.build_temp).replace('temp', 'lib')
+        self._install_lib_dir = os.path.join(self._install_dir, PKG_NAME)
+
+    def get_source_files(self):
+        # Ensure library has been downloaded (sdist might have been skipped)
+        if not has_system_lib():
+            download_library(self)
+
+        # This seems to create issues in MANIFEST.in
+        return [f for _, _, fs in os.walk(absolute_from_setup_dir('libsecp256k1')) for f in fs]
+
+    def run(self):
+        if has_system_lib():
+            logging.info('Using system library')
+            return
+
+        logging.info(self.title)
+        self.bc_set_dirs_download()
+        self.bc_prepare_build()
+
+        try:
+            os.chdir(self._build_temp)
+            logging.info('    cmake install')
+            execute_command_with_temp_log(self.bc_build_command(), debug=True)
+        finally:
+            os.chdir(self._cwd)
+
+        # Register lib installation path
+        self.bc_update_pkg_config_path()
+
+    def bc_set_dirs_download(self):
+        cwd = pathlib.Path().cwd()
+        os.makedirs(self.build_temp, exist_ok=True)
+        self._lib_src = os.path.join(cwd, LIB_NAME)
+        if not os.path.exists(self._lib_src):
+            self.get_source_files()
+
+    def bc_update_pkg_config_path(self):
+        self.pkgconfig_dir = [
+            os.path.join(self._install_lib_dir, 'lib', 'pkgconfig'),
+            os.path.join(self._install_lib_dir, 'lib64', 'pkgconfig'),
+        ]
+        os.environ['PKG_CONFIG_PATH'] = (
+            f'{str(os.pathsep).join(self.pkgconfig_dir)}'
+            f'{os.pathsep}'
+            f'{os.environ.get("PKG_CONFIG_PATH", "")}'
+        ).replace('\\', '/')
+
+        # Verify installation
+        execute_command_with_temp_log([PKGCONFIG, '--exists', LIB_NAME])
+
+    def bc_prepare_build(self):
+        raise NotImplementedError('bc_prepare_build')
+
+    def bc_build_command(self):
+        raise NotImplementedError('bc_build_command')
+
+
 class BuildClibWithCmake(build_clib.build_clib):
     def __init__(self, dist):
         super().__init__(dist)
@@ -119,7 +188,7 @@ class BuildClibWithCmake(build_clib.build_clib):
             '-DCMAKE_BUILD_TYPE=Release',
             # f'-DCMAKE_PREFIX={install_lib_dir}',
             f'-DCMAKE_INSTALL_PREFIX={install_lib_dir}',
-            '-DBUILD_SHARED_LIBS=ON',
+            f'-DBUILD_SHARED_LIBS={"ON" if _SECP256K1_BUILD_TYPE == "SHARED" else "OFF"}',
             '-DSECP256K1_BUILD_BENCHMARKS=OFF',
             '-DSECP256K1_BUILD_TESTS=ON',
             '-DSECP256K1_ENABLE_MODULE_ECDH=ON',
@@ -395,14 +464,14 @@ class BuildCFFIForSharedLib(_BuildCFFI):
                         )
                         logging.info(f'exports: {export}')
                         extra_link_args.append(lib_file)
-#                extra_link_args.append(f'/LIBPATH:{ld}')
-#                lib_file = os.path.join(ld, f'lib{libraries[0]}.lib')
-#                logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
-#                dumpbin = execute_command_with_temp_log(
-#                    [dumpbin, '/exports', lib_file],
-#                    capture_output=True,
-#                )
-#            extra_link_args.extend([f'lib{lib}.lib' for lib in libraries])
+        #                extra_link_args.append(f'/LIBPATH:{ld}')
+        #                lib_file = os.path.join(ld, f'lib{libraries[0]}.lib')
+        #                logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
+        #                dumpbin = execute_command_with_temp_log(
+        #                    [dumpbin, '/exports', lib_file],
+        #                    capture_output=True,
+        #                )
+        #            extra_link_args.extend([f'lib{lib}.lib' for lib in libraries])
         else:
             raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
 
