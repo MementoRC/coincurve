@@ -380,6 +380,7 @@ class BuildCFFIForSharedLib(_BuildCFFI):
                 [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
                 capture_output=True,
             )
+            dumpbin = dumpbin.decode('utf-8', errors='ignore').strip()
             logging.info(f'Using dumpin: {dumpbin}')
 
             for ld in libraries_dirs:
@@ -388,10 +389,11 @@ class BuildCFFIForSharedLib(_BuildCFFI):
                     lib_file = os.path.join(ld, f'lib{lib}.lib')
                     if os.path.exists(lib_file):
                         logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
-                        dumpbin = execute_command_with_temp_log(
+                        export = execute_command_with_temp_log(
                             [dumpbin, '-exports', lib_file],
                             capture_output=True,
                         )
+                        logging.info(f'exports: {export}')
                         extra_link_args.append(lib_file)
 #                extra_link_args.append(f'/LIBPATH:{ld}')
 #                lib_file = os.path.join(ld, f'lib{libraries[0]}.lib')
