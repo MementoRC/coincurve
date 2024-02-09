@@ -85,7 +85,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: artifacts
+        name: artifact-linux-x86-64
         path: wheelhouse/*.whl
         if-no-files-found: error
 
@@ -105,7 +105,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: artifacts
+        name: artifacts-macos-x86-64
         path: wheelhouse/*.whl
         if-no-files-found: error
 
@@ -123,11 +123,11 @@ jobs:
       env:
         CIBW_ARCHS_MACOS: arm64
         COINCURVE_CROSS_HOST: aarch64-apple-darwin
-        CFLAGS: -target arm64-apple-macos11
+        CFLAGS: -target arm64-apple-macos12
 
     - uses: actions/upload-artifact@v4
       with:
-        name: artifacts
+        name: artifact-aarch64-apple-darwin
         path: wheelhouse/*.whl
         if-no-files-found: error
 
@@ -151,7 +151,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: artifacts
+        name: artifact-x-win-x86-64
         path: dist/*
         if-no-files-found: error
 
@@ -180,7 +180,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: artifacts
+        name: artifact-macos12-aarch64
         path: wheelhouse/*.whl
         if-no-files-found: error
 
@@ -197,9 +197,10 @@ jobs:
       github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
 
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
-        name: artifacts
+        name: artifact-*  # This is a workaround for a bug in the upload-artifact@v4 action
+        merge-multiple: true
         path: dist
 
     - name: Push build artifacts to PyPI
