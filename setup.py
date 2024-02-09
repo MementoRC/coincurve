@@ -171,6 +171,7 @@ class BuildClibWithCMake(_BuildClib):
 
     @staticmethod
     def bc_prepare_build(install_lib_dir, build_temp, lib_src):
+
         cmake_args = [
             '-DCMAKE_BUILD_TYPE=Release',
             f'-DCMAKE_INSTALL_PREFIX={install_lib_dir}',
@@ -498,7 +499,7 @@ else:
             setup_requires=['cffi>=1.3.0', 'requests'],
             ext_modules=[extension],
             cmdclass={
-                'build_clib': BuildClibWithCMake if os.name == 'nt' else BuildClibWithMake,
+                'build_clib': BuildClibWithCMake,
                 'build_ext': BuildCFFIExtension,
                 'develop': Develop,
                 'egg_info': EggInfo,
