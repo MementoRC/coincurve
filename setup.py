@@ -159,7 +159,7 @@ class _BuildClib(build_clib.build_clib):
         raise NotImplementedError('This method should be implemented in a Mixin class')
 
 
-class BuildClibWithCMke(_BuildClib):
+class BuildClibWithCMake(_BuildClib):
     @staticmethod
     def _generator(msvc):
         if '2017' in str(msvc):
@@ -206,7 +206,7 @@ class BuildClibWithCMke(_BuildClib):
             logging.info(f'Using MSVC: {msvc}')
 
             # For windows, select the correct toolchain file
-            cmake_args.extend(['-G', BuildClibWithCmake._generator(msvc), '-Ax64'])
+            cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), '-Ax64'])
 
         logging.info('    Configure CMake')
         execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args])
