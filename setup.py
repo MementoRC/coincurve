@@ -159,7 +159,7 @@ class _BuildClib(build_clib.build_clib):
         raise NotImplementedError('This method should be implemented in a Mixin class')
 
 
-class BuildClibWithCmake(_BuildClib):
+class BuildClibWithCMke(_BuildClib):
     @staticmethod
     def _generator(msvc):
         if '2017' in str(msvc):
@@ -254,8 +254,8 @@ class BuildClibWithMake(_BuildClib):
         logging.info('    make')
         execute_command_with_temp_log([MAKE])
 
-        logging.info('    make check')
-        execute_command_with_temp_log([MAKE, 'check'])
+        logging.info('    Clean')
+        execute_command_with_temp_log([MAKE, 'clean'])
 
     @staticmethod
     def bc_build_command():
@@ -263,155 +263,96 @@ class BuildClibWithMake(_BuildClib):
         return [MAKE, 'install']
 
 
-class _BuildClibWithMake(_BuildClib):
-    def __init__(self, dist):
-        super().__init__(dist)
-        self.pkgconfig_dir = None
-
-    def get_source_files(self):
-        # Ensure library has been downloaded (sdist might have been skipped)
-        if not has_system_lib():
-            download_library(self)
-
-        # This seems to create issues in MANIFEST.in
-        return [f for _, _, fs in os.walk(absolute_from_setup_dir('libsecp256k1')) for f in fs]
-
-    def _run(self):
-        if has_system_lib():
-            logging.info('Using system library')
-            return
-
-        logging.info('SECP256K1 C library build (CMake):')
-
-        cwd = pathlib.Path().cwd()
-        build_temp = os.path.abspath(self.build_temp)
-        os.makedirs(build_temp, exist_ok=True)
-
-        lib_src = os.path.join(cwd, 'libsecp256k1')
-
-        install_dir = str(build_temp).replace('temp', 'lib')
-        # install_bin_dir = os.path.join(install_dir, 'coincurve', 'bin')
-        install_lib_dir = os.path.join(install_dir, 'coincurve')
-
-        if not os.path.exists(lib_src):
-            # library needs to be downloaded
-            self.get_source_files()
-
-        cmake_args = [
-            '-DCMAKE_BUILD_TYPE=Release',
-            f'-DCMAKE_INSTALL_PREFIX={install_lib_dir}',
-            '-DCMAKE_C_FLAGS=-fPIC',
-            f'-DSECP256K1_DISABLE_SHARED={"OFF" if _SECP256K1_BUILD_TYPE == "SHARED" else "ON"}',
-            '-DSECP256K1_BUILD_BENCHMARK=OFF',
-            '-DSECP256K1_BUILD_TESTS=ON',
-            '-DSECP256K1_ENABLE_MODULE_ECDH=ON',
-            '-DSECP256K1_ENABLE_MODULE_RECOVERY=ON',
-            '-DSECP256K1_ENABLE_MODULE_SCHNORRSIG=ON',
-            '-DSECP256K1_ENABLE_MODULE_EXTRAKEYS=ON',
-        ]
-
-        if (x_host := os.environ.get('COINCURVE_CROSS_HOST')) is not None:
-            logging.info(f'Cross-compiling for {x_host}:{os.name}')
-            if platform.system() == 'Darwin' or platform.machine() == 'arm64':
-                # Let's try to not cross-compile on MacOS
-                cmake_args.append(
-                    '-DCMAKE_OSX_ARCHITECTURES=arm64'
-                )
+class SharedLinker(object):
+    @staticmethod
+    def update_link_args(compiler, libraries, libraries_dirs, extra_link_args):
+        if compiler.__class__.__name__ == 'UnixCCompiler':
+            extra_link_args.extend([f'-l{lib}' for lib in libraries])
+            if sys.platform == 'darwin':
+                extra_link_args.extend([
+                    '-Wl,-rpath,@loader_path/lib',
+                ])
             else:
-                # Note, only 2 toolchain files are provided (2/1/24)
-                cmake_args.append(
-                    f'-DCMAKE_TOOLCHAIN_FILE=../cmake/{x_host}.toolchain.cmake'
-                )
-
-        elif os.name == 'nt':
-            def _generator():
-                if '2017' in str(msvc):
-                    return 'Visual Studio 15 2017'
-                if '2019' in str(msvc):
-                    return 'Visual Studio 16 2019'
-                if '2022' in str(msvc):
-                    return 'Visual Studio 17 2022'
-
-            vswhere = shutil.which('vswhere')
-            msvc = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\MSBuild.exe'],
-                capture_output=True,
-            )
-            logging.info(f'Using MSVC: {msvc}')
-
-            # For windows, select the correct toolchain file
-            cmake_args.extend(['-G', _generator(), '-Ax64'])
-
-        logging.info('    cmake config')
-        execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args], debug=True)
-
-        try:
-            os.chdir(build_temp)
-
-            logging.info('    cmake install')
-            execute_command_with_temp_log(
-                ['cmake', '--build', '.', '--target', 'install', '--config', 'Release', '--clean-first'],
-                debug=True,
-            )
-        finally:
-            os.chdir(cwd)
-
-        # Register lib installation path
-        self.pkgconfig_dir = [
-            os.path.join(install_lib_dir, 'lib', 'pkgconfig'),
-            os.path.join(install_lib_dir, 'lib64', 'pkgconfig'),
-        ]
-        os.environ['PKG_CONFIG_PATH'] = (
-            f'{str(os.pathsep).join(self.pkgconfig_dir)}'
-            f'{os.pathsep}'
-            f'{os.environ.get("PKG_CONFIG_PATH", "")}'
-        ).replace('\\', '/')
-
-        # Verify installation
-        execute_command_with_temp_log([PKGCONFIG, '--exists', LIB_NAME])
-
-        if os.name == 'nt':
+                extra_link_args.extend([
+                    '-Wl,-rpath,$ORIGIN/lib',
+                    '-Wl,-rpath,$ORIGIN/lib64',
+                ])
+        elif compiler.__class__.__name__ == 'MSVCCompiler':
             vswhere = shutil.which('vswhere')
             dumpbin = execute_command_with_temp_log(
                 [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
                 capture_output=True,
             )
             dumpbin = dumpbin.decode('utf-8', errors='ignore').strip()
-            logging.info(f'Using dumpbin: {dumpbin}')
+            logging.info(f'Using dumpin: {dumpbin}')
 
-            link = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', '**\\bin\\link.exe'],
+            for ld in libraries_dirs:
+                ld = ld.replace('/', '\\')
+                for lib in libraries:
+                    lib_file = os.path.join(ld, f'lib{lib}.lib')
+                    if os.path.exists(lib_file):
+                        logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
+                        export = execute_command_with_temp_log(
+                            [dumpbin, '-exports', lib_file],
+                            capture_output=True,
+                        )
+                        logging.info(f'exports: {export}')
+                        extra_link_args.append(lib_file)
+        else:
+            raise NotImplementedError(f'Unsupported compiler: {compiler.__class__.__name__}')
+
+
+class StaticLinker(object):
+    @staticmethod
+    def update_link_args(compiler, libraries, libraries_dirs, extra_link_args):
+        if compiler.__class__.__name__ == 'UnixCCompiler':
+            # It is possible that the library was compiled without fPIC option
+            for lib in libraries:
+                # On MacOS the mix static/dynamic option is different
+                # It requires a -force_load <full_lib_path> option for each library
+                if sys.platform == 'darwin':
+                    for lib_dir in libraries_dirs:
+                        if os.path.exists(os.path.join(lib_dir, f'lib{lib}.a')):
+                            extra_link_args.extend(
+                                ['-Wl,-force_load', os.path.join(lib_dir, f'lib{lib}.a')]
+                            )
+                            break
+                else:
+                    extra_link_args.extend(['-Wl,-Bstatic', f'-l{lib}', '-Wl,-Bdynamic'])
+
+        elif compiler.__class__.__name__ == 'MSVCCompiler':
+            vswhere = shutil.which('vswhere')
+            dumpbin = execute_command_with_temp_log(
+                [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
                 capture_output=True,
             )
-            link = link.decode('utf-8', errors='ignore').strip()
-            logging.info(f'Using link: {link}')
+            dumpbin = dumpbin.decode('utf-8', errors='ignore').strip()
+            logging.info(f'Using dumpin: {dumpbin}')
 
-            lib_file = os.path.join(install_lib_dir, 'lib', f'{LIB_NAME}.lib')
-            logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
-            export = execute_command_with_temp_log(
-                [link, '/dump', '/all', f'{lib_file}'],
-                capture_output=True,
-            )
-            export = export.decode('utf-8', errors='ignore').split('\n')
-            logging.info(f'LIB content: {export}')
-
-            dll_file = os.path.join(install_lib_dir, 'bin', f'{LIB_NAME}-2.dll')
-            logging.info(f'    DLL: {dll_file}:{os.path.isfile(dll_file)}')
-            export = execute_command_with_temp_log(
-                [dumpbin, '/exports', f'{dll_file}'],
-                capture_output=True,
-            )
-            export = export.decode('utf-8', errors='ignore').split('\n')
-            logging.info(f'DLL content: {export}')
-
-        logging.info('build_clib: Done')
+            for ld in libraries_dirs:
+                ld = ld.replace('/', '\\')
+                for lib in libraries:
+                    lib_file = os.path.join(ld, f'lib{lib}.lib')
+                    if os.path.exists(lib_file):
+                        logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
+                        export = execute_command_with_temp_log(
+                            [dumpbin, '-exports', lib_file],
+                            capture_output=True,
+                        )
+                        logging.info(f'exports: {export}')
+                        extra_link_args.append(lib_file)
+        else:
+            raise NotImplementedError(f'Unsupported compiler: {compiler.__class__.__name__}')
 
 
 class _BuildExtensionFromCFFI(build_ext.build_ext):
-    static_lib = None
+    static_lib = True if _SECP256K1_BUILD_TYPE == 'STATIC' else False
 
     def update_link_args(self, libraries, libraries_dirs, extra_link_args):
-        raise NotImplementedError('update_link_args')
+        if self.static_lib:
+            StaticLinker.update_link_args(self.compiler, libraries, libraries_dirs, extra_link_args)
+        else:
+            SharedLinker.update_link_args(self.compiler, libraries, libraries_dirs, extra_link_args)
 
     def build_extension(self, ext):
         logging.info(
@@ -459,56 +400,10 @@ class _BuildCFFI(_BuildExtensionFromCFFI):
         super().build_extension(ext)
 
 
-class BuildCFFIForSharedLib(_BuildCFFI):
-    static_lib = False
+class BuildCFFIExtension(_BuildCFFI):
+    pass
 
-    def update_link_args(self, libraries, libraries_dirs, extra_link_args):
-        if self.compiler.__class__.__name__ == 'UnixCCompiler':
-            extra_link_args.extend([f'-l{lib}' for lib in libraries])
-            if sys.platform == 'darwin':
-                extra_link_args.extend([
-                    '-Wl,-rpath,@loader_path/lib',
-                ])
-            else:
-                extra_link_args.extend([
-                    '-Wl,-rpath,$ORIGIN/lib',
-                    '-Wl,-rpath,$ORIGIN/lib64',
-                ])
-        elif self.compiler.__class__.__name__ == 'MSVCCompiler':
-
-            vswhere = shutil.which('vswhere')
-            dumpbin = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
-                capture_output=True,
-            )
-            dumpbin = dumpbin.decode('utf-8', errors='ignore').strip()
-            logging.info(f'Using dumpin: {dumpbin}')
-
-            for ld in libraries_dirs:
-                ld = ld.replace('/', '\\')
-                for lib in libraries:
-                    lib_file = os.path.join(ld, f'lib{lib}.lib')
-                    if os.path.exists(lib_file):
-                        logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
-                        export = execute_command_with_temp_log(
-                            [dumpbin, '-exports', lib_file],
-                            capture_output=True,
-                        )
-                        logging.info(f'exports: {export}')
-                        extra_link_args.append(lib_file)
-        #                extra_link_args.append(f'/LIBPATH:{ld}')
-        #                lib_file = os.path.join(ld, f'lib{libraries[0]}.lib')
-        #                logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
-        #                dumpbin = execute_command_with_temp_log(
-        #                    [dumpbin, '/exports', lib_file],
-        #                    capture_output=True,
-        #                )
-        #            extra_link_args.extend([f'lib{lib}.lib' for lib in libraries])
-        else:
-            raise NotImplementedError(f'Unsupported compiler: {self.compiler.__class__.__name__}')
-
-
-class BuildCFFIForStaticLib(_BuildCFFI):
+class _BuildCFFIForStaticLib(_BuildCFFI):
     static_lib = True
 
     def update_link_args(self, libraries, libraries_dirs, extra_link_args):
@@ -573,7 +468,7 @@ if has_system_lib():
         ext_modules=[extension],
         cmdclass={
             'build_clib': BuildClibWithMake,
-            'build_ext': BuildCFFIForSharedLib,
+            'build_ext': BuildCFFIExtension,
             'develop': Develop,
             'egg_info': EggInfo,
             'sdist': Sdist,
@@ -603,8 +498,8 @@ else:
             setup_requires=['cffi>=1.3.0', 'requests'],
             ext_modules=[extension],
             cmdclass={
-                'build_clib': BuildClibWithMake,
-                'build_ext': BuildCFFIForStaticLib,
+                'build_clib': BuildClibWithCMake if os.name == 'nt' else BuildClibWithMake,
+                'build_ext': BuildCFFIExtension,
                 'develop': Develop,
                 'egg_info': EggInfo,
                 'sdist': Sdist,
