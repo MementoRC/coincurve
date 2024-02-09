@@ -38,7 +38,7 @@ TAR_NAME = f'secp256k1-{UPSTREAM_REF}'
 LIB_NAME = 'libsecp256k1'
 PKG_NAME = 'coincurve'
 
-_SECP256K1_BUILD_TYPE = 'STATIC'
+_SECP256K1_BUILD_TYPE = 'SHARED'
 
 
 class EggInfo(egg_info.egg_info):
