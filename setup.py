@@ -70,8 +70,8 @@ class Develop(develop.develop):
     def run(self):
         if not has_system_lib():
             raise RuntimeError(
-                "This library is not usable in 'develop' mode when using the "
-                'bundled libsecp256k1. See README for details.'
+                'This library is not usable in "develop" mode when using the '
+                f'bundled {LIB_NAME}. See README for details.'
             )
         super().run()
 
@@ -175,7 +175,7 @@ class BuildClibWithCMake(_BuildClib):
         cmake_args = [
             '-DCMAKE_BUILD_TYPE=Release',
             f'-DCMAKE_INSTALL_PREFIX={install_lib_dir}',
-            '-DCMAKE_C_FLAGS=-fPIC',
+            f'-DCMAKE_C_FLAGS={"-fPIC" if _SECP256K1_BUILD_TYPE == "SHARED" and os.name != "nt" else "ON"}',
             f'-DSECP256K1_DISABLE_SHARED={"OFF" if _SECP256K1_BUILD_TYPE == "SHARED" else "ON"}',
             '-DSECP256K1_BUILD_BENCHMARK=OFF',
             '-DSECP256K1_BUILD_TESTS=ON',
@@ -371,10 +371,11 @@ class _BuildExtensionFromCFFI(build_ext.build_ext):
         c_lib_pkg = os.path.join(self.build_lib, 'coincurve', 'lib', 'pkgconfig')
 
         # PKG_CONFIG_PATH is updated by build_clib if built locally
-        ext.include_dirs.extend(build_flags('libsecp256k1', 'I', c_lib_pkg))
-        ext.library_dirs.extend(build_flags('libsecp256k1', 'L', c_lib_pkg))
+        # Do not override the CFFI C-file secp256k1.h with the one from the source distribution
+        # ext.include_dirs.extend(build_flags(LIB_NAME, 'I', c_lib_pkg))
+        ext.library_dirs.extend(build_flags(LIB_NAME, 'L', c_lib_pkg))
 
-        libraries = build_flags('libsecp256k1', 'l', c_lib_pkg)
+        libraries = build_flags(LIB_NAME, 'l', c_lib_pkg)
         logging.info(f'  Libraries:{libraries}')
 
         # We do not set ext.libraries, this would add the default link instruction
@@ -408,11 +409,11 @@ class BuildCFFIExtension(_BuildCFFI):
     pass
 
 
-package_data = {'coincurve': ['py.typed']}
+package_data = {PKG_NAME: ['py.typed']}
 
 extension = Extension(
-    name='coincurve._libsecp256k1',
-    sources=[os.path.join('coincurve', '_libsecp256k1.c')],
+    name=f'{PKG_NAME}._{LIB_NAME}',
+    sources=[os.path.join(PKG_NAME, f'_{LIB_NAME}.c')],
     py_limited_api=False,
 )
 
@@ -445,7 +446,7 @@ else:
                 return False
 
 
-        package_data['coincurve'].append('libsecp256k1.dll')
+        package_data[PKG_NAME].append(f'{LIB_NAME}.dll')
         setup_kwargs = {}
 
     else:
@@ -471,10 +472,10 @@ else:
 
 def main():
     setup(
-        name='coincurve',
+        name=PKG_NAME,
         version='19.0.0',
 
-        packages=find_packages(exclude=('_cffi_build', '_cffi_build.*', 'libsecp256k1', 'tests')),
+        packages=find_packages(exclude=('_cffi_build', '_cffi_build.*', LIB_NAME, 'tests')),
         package_data=package_data,
 
         distclass=Distribution,
