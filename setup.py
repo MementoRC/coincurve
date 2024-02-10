@@ -175,7 +175,7 @@ class BuildClibWithCMake(_BuildClib):
         cmake_args = [
             '-DCMAKE_BUILD_TYPE=Release',
             f'-DCMAKE_INSTALL_PREFIX={install_lib_dir}',
-            f'-DCMAKE_C_FLAGS={"-fPIC" if _SECP256K1_BUILD_TYPE == "SHARED" and os.name != "nt" else "ON"}',
+            f'-DCMAKE_C_FLAGS={"-fPIC" if _SECP256K1_BUILD_TYPE == "SHARED" and os.name != "nt" else ""}',
             f'-DSECP256K1_DISABLE_SHARED={"OFF" if _SECP256K1_BUILD_TYPE == "SHARED" else "ON"}',
             '-DSECP256K1_BUILD_BENCHMARK=OFF',
             '-DSECP256K1_BUILD_TESTS=ON',
