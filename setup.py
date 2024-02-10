@@ -291,6 +291,7 @@ class SharedLinker(object):
                 ld = ld.replace('/', '\\')
                 for lib in libraries:
                     lib_file = os.path.join(ld, f'lib{lib}.lib')
+                    lib_path = [f'/LIBPATH:{ld}', f'{lib}.lib']
                     if os.path.exists(lib_file):
                         logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
                         export = execute_command_with_temp_log(
@@ -298,7 +299,7 @@ class SharedLinker(object):
                             capture_output=True,
                         )
                         logging.info(f'exports: {export}')
-                        extra_link_args.append(lib_file)
+                        extra_link_args.extend(lib_path)
         else:
             raise NotImplementedError(f'Unsupported compiler: {compiler.__class__.__name__}')
 
@@ -373,7 +374,7 @@ class _BuildExtensionFromCFFI(build_ext.build_ext):
         # PKG_CONFIG_PATH is updated by build_clib if built locally
         # Do not override the CFFI C-file secp256k1.h with the one from the source distribution
         # ext.include_dirs.extend(build_flags(LIB_NAME, 'I', c_lib_pkg))
-        ext.extra_compile_args.extend(['-I', build_flags(LIB_NAME, 'I', c_lib_pkg)])
+        ext.extra_compile_args.extend([f'-I{build_flags(LIB_NAME, 'I', c_lib_pkg)}'])
         ext.library_dirs.extend(build_flags(LIB_NAME, 'L', c_lib_pkg))
 
         libraries = build_flags(LIB_NAME, 'l', c_lib_pkg)
