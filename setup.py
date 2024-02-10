@@ -291,7 +291,7 @@ class SharedLinker(object):
                 ld = ld.replace('/', '\\')
                 for lib in libraries:
                     lib_file = os.path.join(ld, f'lib{lib}.lib')
-                    lib_path = [f'/LIBPATH:{ld}', f'{lib}.lib']
+                    lib_path = [f'/LIBPATH:{ld}', f'lib{lib}.lib']
                     if os.path.exists(lib_file):
                         logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
                         export = execute_command_with_temp_log(
