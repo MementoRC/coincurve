@@ -31,18 +31,16 @@ def gather_sources_from_directory(directory: str) -> List[Source]:
 define_static_lib = """
 #if defined(_WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
   #define SECP256K1_STATIC 1
-  #define SECP256K1_API extern __declspec(dllexport)
+  /* #define SECP256K1_API extern __declspec(dllexport) */
 #endif
 """
 
 define_shared_lib = """
-#if defined(_WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-  #ifdef COMPILED
-    #define SECP256K1_API extern __declspec(dllexport)
-  #else
-    #define SECP256K1_API extern __declspec(dllimport)
-  #endif
-#endif
+/***
+* #if defined(_WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+*   #define SECP256K1_API extern __declspec(dllimport)
+* #endif
+***/
 """
 
 

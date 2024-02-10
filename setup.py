@@ -373,6 +373,7 @@ class _BuildExtensionFromCFFI(build_ext.build_ext):
         # PKG_CONFIG_PATH is updated by build_clib if built locally
         # Do not override the CFFI C-file secp256k1.h with the one from the source distribution
         # ext.include_dirs.extend(build_flags(LIB_NAME, 'I', c_lib_pkg))
+        ext.include_dirs.extend(build_flags(LIB_NAME, 'I', c_lib_pkg))
         ext.library_dirs.extend(build_flags(LIB_NAME, 'L', c_lib_pkg))
 
         libraries = build_flags(LIB_NAME, 'l', c_lib_pkg)
