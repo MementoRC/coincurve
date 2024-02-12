@@ -207,7 +207,9 @@ class BuildClibWithCMake(_BuildClib):
             logging.info(f'Using MSVC: {msvc}')
 
             # For windows, select the correct toolchain file
-            cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), '-Ax64'])
+            arch = '-Ax64' if platform.machine().endswith('64') else '-AWin32'
+            arch = '-AARM' if platform.machine() == 'arm64' else arch
+            cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), arch])
 
         logging.info('    Configure CMake')
         execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args])
