@@ -209,6 +209,7 @@ class BuildClibWithCMake(_BuildClib):
             # For windows, select the correct toolchain file
             arch = '-Ax64' if platform.machine().endswith('64') else '-AWin32'
             arch = '-AARM' if platform.machine() == 'arm64' else arch
+            logging.info(f'Arch: {arch}')
             cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), arch])
 
         logging.info('    Configure CMake')
