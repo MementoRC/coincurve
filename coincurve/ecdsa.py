@@ -2,7 +2,7 @@ from coincurve.context import GLOBAL_CONTEXT, Context
 from coincurve.types import Hasher
 from coincurve.utils import bytes_to_int, int_to_bytes, sha256
 
-from ._libsecp256k1 import ffi, lib
+from coincurve._libsecp256k1 import ffi, lib
 
 MAX_SIG_LENGTH = 72
 CDATA_SIG_LENGTH = 64

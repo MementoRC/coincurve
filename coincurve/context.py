@@ -4,7 +4,7 @@ from typing import Optional
 
 from coincurve.flags import CONTEXT_FLAGS, CONTEXT_NONE
 
-from ._libsecp256k1 import ffi, lib
+from coincurve._libsecp256k1 import ffi, lib
 
 
 class Context:

@@ -20,7 +20,7 @@ from coincurve.utils import (
     validate_secret,
 )
 
-from ._libsecp256k1 import ffi, lib
+from coincurve._libsecp256k1 import ffi, lib
 
 
 class PrivateKey:

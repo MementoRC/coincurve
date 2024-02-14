@@ -6,7 +6,7 @@ from typing import Generator
 from coincurve.context import GLOBAL_CONTEXT, Context
 from coincurve.types import Hasher
 
-from ._libsecp256k1 import ffi, lib
+from coincurve._libsecp256k1 import ffi, lib
 
 GROUP_ORDER = (
     b'\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
