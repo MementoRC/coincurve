@@ -207,8 +207,7 @@ class BuildClibWithCMake(_BuildClib):
             logging.info(f'Using MSVC: {msvc}')
 
             # For windows, select the correct toolchain file
-            arch = f'-A{sys.platform}'
-            arch = '-AARM' if platform.uname().machine == 'ARM64' else arch
+            arch = f'-A{platform.machine()}'
             logging.info(f'Arch: {arch}')
             cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), arch])
 
@@ -417,7 +416,7 @@ extension = Extension(
     name=f'{PKG_NAME}._{LIB_NAME}',
     sources=[os.path.join(PKG_NAME, f'_{LIB_NAME}.c')],
     py_limited_api=False,
-    # Only needed for <3.8.3 # extra_compile_args=['/d2FH4-'] if sys.platform == 'win32' else []
+    extra_compile_args=['/d2FH4-'] if sys.platform == 'win32' else []
 )
 
 if has_system_lib():
