@@ -417,6 +417,7 @@ extension = Extension(
     name=f'{PKG_NAME}._{LIB_NAME}',
     sources=[os.path.join(PKG_NAME, f'_{LIB_NAME}.c')],
     py_limited_api=False,
+    extra_compile_args=['/d2FH4-'] if sys.platform == 'win32' else []
 )
 
 if has_system_lib():
