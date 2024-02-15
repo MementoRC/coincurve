@@ -171,7 +171,6 @@ class BuildClibWithCMake(_BuildClib):
 
     @staticmethod
     def bc_prepare_build(install_lib_dir, build_temp, lib_src):
-
         cmake_args = [
             '-DCMAKE_BUILD_TYPE=Release',
             f'-DCMAKE_INSTALL_PREFIX={install_lib_dir}',
@@ -185,39 +184,45 @@ class BuildClibWithCMake(_BuildClib):
             '-DSECP256K1_ENABLE_MODULE_EXTRAKEYS=ON',
         ]
 
-        if (x_host := os.environ.get('COINCURVE_CROSS_HOST')) is not None and os.name != 'nt':
-            logging.info(f'Cross-compiling for {x_host}:{os.name}')
-            if platform.system() == 'Darwin' or platform.machine() == 'arm64':
-                # Let's try to not cross-compile on MacOS
-                cmake_args.append(
-                    '-DCMAKE_OSX_ARCHITECTURES=arm64'
-                )
-            else:
-                # Note, only 2 toolchain files are provided (2/1/24)
-                cmake_args.append(
-                    f'-DCMAKE_TOOLCHAIN_FILE=../cmake/{x_host}.toolchain.cmake'
-                )
+        logging.info(f'    CMake for {platform.uname()}')
+        logging.info(f'      system: {platform.system()}')
+        logging.info(f'     os.name: {os.name}')
+        logging.info(f'     machine: {platform.machine()}')
 
-        elif os.name == 'nt':
+        _os = os.name
+        _system = platform.system()
+        _arch = platform.machine()
+        _x_host = os.environ.get('COINCURVE_CROSS_HOST')
+
+        # Windows (more complex)
+        if _os == 'nt':
             vswhere = shutil.which('vswhere')
             msvc = execute_command_with_temp_log(
                 [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\MSBuild.exe'],
                 capture_output=True,
             )
-            logging.info(f'Using MSVC: {msvc}')
-            logging.info(f'Using MSVC: {vars(os.environ)}')
 
-            # For windows, select the correct toolchain file
-            arch = 'x64' if platform.machine() == 'AMD64' else 'Win32'
-
-            if os.environ.get('COINCURVE_CROSS_HOST') is not None:
-                # Cross-compiling for ARM64
+            # For windows x86/x64, select the correct architecture
+            arch = 'x64' if _arch == 'AMD64' else 'Win32'
+            if _x_host is not None:
+                # Cross-compiling for ARM64 - For now we only plan to x-compile for ARM64
                 arch = 'ARM64'
-            arch = '-AARM64' if platform.machine() == 'ARM64' else f'-A{arch}'
-            logging.info(f'Arch: {arch}:{platform.machine()}')
 
+            # Place the DLL directly in the package directory
             cmake_args.append('-DCMAKE_INSTALL_BINDIR=.')
             cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), arch])
+
+        elif _x_host is not None:
+            logging.info('Cross-compiling')
+            if platform.system() == 'Darwin' or platform.machine() == 'ARM64':
+                cmake_args.append(
+                    '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"'
+                )
+            else:
+                # Note, only 2 toolchain files are provided (2/1/24)
+                cmake_args.append(
+                    f'-DCMAKE_TOOLCHAIN_FILE=../cmake/{_x_host}.toolchain.cmake'
+                )
 
         logging.info('    Configure CMake')
         execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args])
