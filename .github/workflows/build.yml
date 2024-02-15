@@ -180,7 +180,7 @@ jobs:
         if-no-files-found: error
 
   windows-wheels-arm:
-    name: Build Windows wheels
+    name: Build Windows wheels for ARM
     needs:
     - test
     runs-on: windows-latest

@@ -208,8 +208,8 @@ class BuildClibWithCMake(_BuildClib):
 
             # For windows, select the correct toolchain file
             arch = 'x64' if platform.machine() == 'AMD64' else 'Win32'
-            arch = '-AARM64' if platform.machine() == 'arm64' else f'-A{arch}'
-            logging.info(f'Arch: {arch}')
+            arch = '-AARM64' if platform.machine() == 'ARM64' else f'-A{arch}'
+            logging.info(f'Arch: {arch}:{platform.machine()}')
             cmake_args.append('-DCMAKE_INSTALL_BINDIR=.')
             cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), arch])
 
