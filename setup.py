@@ -185,7 +185,7 @@ class BuildClibWithCMake(_BuildClib):
             '-DSECP256K1_ENABLE_MODULE_EXTRAKEYS=ON',
         ]
 
-        if (x_host := os.environ.get('COINCURVE_CROSS_HOST')) is not None:
+        if (x_host := os.environ.get('COINCURVE_CROSS_HOST')) is not None and os.name != 'nt':
             logging.info(f'Cross-compiling for {x_host}:{os.name}')
             if platform.system() == 'Darwin' or platform.machine() == 'arm64':
                 # Let's try to not cross-compile on MacOS
