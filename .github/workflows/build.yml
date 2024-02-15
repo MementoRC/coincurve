@@ -193,6 +193,7 @@ jobs:
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
       env:
+        COINCURVE_CROSS_HOST: aarch64-pc-windows-msvc
         CIBW_ARCHS_WINDOWS: "ARM64"
         CIBW_BUILD_VERBOSITY: 1
         CIBW_BEFORE_ALL: choco install -y --no-progress --no-color cmake>=3.28 pkgconfiglite
