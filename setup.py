@@ -210,7 +210,7 @@ class BuildClibWithCMake(_BuildClib):
             arch = 'x64' if platform.machine() == 'AMD64' else 'Win32'
             arch = '-AARM64' if platform.machine() == 'arm64' else f'-A{arch}'
             logging.info(f'Arch: {arch}')
-            cmake_args.append(f'-DCMAKE_INSTALL_BINDIR=.')
+            cmake_args.append('-DCMAKE_INSTALL_BINDIR=.')
             cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), arch])
 
         logging.info('    Configure CMake')
