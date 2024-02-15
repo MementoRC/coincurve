@@ -166,21 +166,36 @@ jobs:
 
     - uses: actions/setup-python@v5
 
-    # - name: Remove libsecp256k1 egg-info
-    #   run: |
-    #     Get-ChildItem -Recurse -Filter *.egg-info | Remove-Item -Force
-
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
       env:
         CIBW_ARCHS_WINDOWS: "AMD64"
         CIBW_BUILD_VERBOSITY: 1
         CIBW_BEFORE_ALL: choco install -y --no-progress --no-color cmake>=3.28 pkgconfiglite
-        # CIBW_BEFORE_TEST_WINDOWS: bash {project}/.github/scripts/build-minimal-windows-image.sh 312
-        # CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: bash {project}/.github/repair-windows-wheels.sh {wheel} {dest_dir}
-        # CIBW_TEST_COMMAND_WINDOWS: bash {project}/.github/scripts/test-windows-wheels.sh 312
-        # CIBW_TEST_REQUIRES: pytest pytest-benchmark
-        # CIBW_TEST_COMMAND: python -m pytest {project}
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: wheelhouse/*.whl
+        if-no-files-found: error
+
+  windows-wheels-arm:
+    name: Build Windows wheels
+    needs:
+    - test
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.16.5
+      env:
+        CIBW_ARCHS_WINDOWS: "ARM64"
+        CIBW_BUILD_VERBOSITY: 1
+        CIBW_BEFORE_ALL: choco install -y --no-progress --no-color cmake>=3.28 pkgconfiglite
 
     - uses: actions/upload-artifact@v3
       with:
