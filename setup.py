@@ -189,13 +189,15 @@ class BuildClibWithCMake(_BuildClib):
         logging.info(f'     os.name: {os.name}')
         logging.info(f'     machine: {platform.machine()}')
 
-        _os = os.name
-        _system = platform.system()
-        _arch = platform.machine()
+        _system = platform.system()   # supported: Windows, Linux, Darwin
+        _machine = platform.machine()   # supported: AMD64, x86_64
+
+        # Cross-compile for Windows/ARM64, Linux/ARM64, Darwin/ARM64
         _x_host = os.environ.get('COINCURVE_CROSS_HOST')
+        _x_host = _x_host.upper() if _x_host else None
 
         # Windows (more complex)
-        if _os == 'nt':
+        if _system == 'Windows':
             vswhere = shutil.which('vswhere')
             msvc = execute_command_with_temp_log(
                 [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\MSBuild.exe'],
@@ -203,10 +205,9 @@ class BuildClibWithCMake(_BuildClib):
             )
 
             # For windows x86/x64, select the correct architecture
-            arch = 'x64' if _arch == 'AMD64' else 'Win32'
-            if _x_host is not None:
-                # Cross-compiling for ARM64 - For now we only plan to x-compile for ARM64
-                arch = 'ARM64'
+            arch = 'x64' if _machine == 'AMD64' else 'Win32'
+            if _x_host in ['ARM64', 'ARM']:
+                arch = _x_host  # can it be ARM
 
             # Place the DLL directly in the package directory
             cmake_args.append('-DCMAKE_INSTALL_BINDIR=.')
@@ -216,7 +217,7 @@ class BuildClibWithCMake(_BuildClib):
             logging.info('Cross-compiling')
             if platform.system() == 'Darwin' or platform.machine() == 'ARM64':
                 cmake_args.append(
-                    '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"'
+                    f'-DCMAKE_OSX_ARCHITECTURES={_x_host}'
                 )
             else:
                 # Note, only 2 toolchain files are provided (2/1/24)

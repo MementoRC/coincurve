@@ -75,7 +75,7 @@ jobs:
     name: Build Linux wheels
     needs:
     - test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -93,7 +93,7 @@ jobs:
     name: Build macOS wheels
     needs:
     - test
-    runs-on: macos-12
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -113,7 +113,7 @@ jobs:
     name: Build macOS wheels for ARM
     needs:
     - test
-    runs-on: macos-12
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -122,8 +122,7 @@ jobs:
       uses: pypa/cibuildwheel@v2.16.2
       env:
         CIBW_ARCHS_MACOS: arm64
-        COINCURVE_CROSS_HOST: aarch64-apple-darwin
-        CFLAGS: -target arm64-apple-macos11
+        COINCURVE_CROSS_HOST: 'arm64'
 
     - uses: actions/upload-artifact@v3
       with:
@@ -131,31 +130,7 @@ jobs:
         path: wheelhouse/*.whl
         if-no-files-found: error
 
-  windows-wheels-and-sdist:
-    name: Build Windows wheels and source distribution
-    needs:
-    - test
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Install build dependencies
-      run: python -m pip install --upgrade cffi
-
-    - name: Build source distribution
-      run: python setup.py sdist
-
-    - name: Build Windows wheels
-      run: ./.github/scripts/build-windows-wheels.sh
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: artifacts
-        path: dist/*
-        if-no-files-found: error
-
-  windows-wheels-standard:
+  windows-wheels-x86:
     name: Build Windows wheels
     needs:
     - test
@@ -169,7 +144,7 @@ jobs:
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
       env:
-        CIBW_ARCHS_WINDOWS: "AMD64"
+        CIBW_ARCHS_WINDOWS: "x86"
         CIBW_BUILD_VERBOSITY: 1
         CIBW_BEFORE_ALL: choco install -y --no-progress --no-color cmake>=3.28 pkgconfiglite
 
@@ -193,7 +168,32 @@ jobs:
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
       env:
-        COINCURVE_CROSS_HOST: aarch64-pc-windows-msvc
+        COINCURVE_CROSS_HOST: "ARM"
+        CIBW_ARCHS_WINDOWS: "ARM"
+        CIBW_BUILD_VERBOSITY: 1
+        CIBW_BEFORE_ALL: choco install -y --no-progress --no-color cmake>=3.28 pkgconfiglite
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: wheelhouse/*.whl
+        if-no-files-found: error
+
+  windows-wheels-arm64:
+    name: Build Windows wheels for ARM64
+    needs:
+    - test
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.16.5
+      env:
+        COINCURVE_CROSS_HOST: "ARM64"
         CIBW_ARCHS_WINDOWS: "ARM64"
         CIBW_BUILD_VERBOSITY: 1
         CIBW_BEFORE_ALL: choco install -y --no-progress --no-color cmake>=3.28 pkgconfiglite
@@ -204,11 +204,11 @@ jobs:
         path: wheelhouse/*.whl
         if-no-files-found: error
 
-  linux-wheels-arm:
-    name: Build Linux wheels for ARM
+  linux-wheels-arm64:
+    name: Build Linux wheels for ARM64
     needs:
     - test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: >
       github.event_name == 'push'
       &&
@@ -239,8 +239,10 @@ jobs:
     - linux-wheels-standard
     - macos-wheels-x86-64
     - macos-wheels-arm
-    - windows-wheels-and-sdist
-    - linux-wheels-arm
+    - windows-wheels-x86
+    - windows-wheels-arm
+    - windows-wheels-arm64
+    - linux-wheels-arm64
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
