@@ -17,7 +17,7 @@ except ImportError:
 
 PACKAGE_SETUP_DIR = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(PACKAGE_SETUP_DIR)
-from setup_support import absolute_from_setup_dir, build_flags, detect_dll, download_library, hasSYSTEM_lib, \
+from setup_support import absolute_from_setup_dir, build_flags, detect_dll, download_library, has_system_lib, \
     execute_command_with_temp_log  # noqa: E402
 
 BUILDING_FOR_WINDOWS = detect_dll()
@@ -58,7 +58,7 @@ logging.info(
 class EggInfo(egg_info.egg_info):
     def run(self):
         # Ensure library has been downloaded (sdist might have been skipped)
-        if not hasSYSTEM_lib():
+        if not has_system_lib():
             download_library(self)
 
         super().run()
@@ -67,7 +67,7 @@ class EggInfo(egg_info.egg_info):
 class DistInfo(dist_info.dist_info):
     def run(self):
         # Ensure library has been downloaded (sdist might have been skipped)
-        if not hasSYSTEM_lib():
+        if not has_system_lib():
             download_library(self)
 
         super().run()
@@ -75,14 +75,14 @@ class DistInfo(dist_info.dist_info):
 
 class Sdist(sdist.sdist):
     def run(self):
-        if not hasSYSTEM_lib():
+        if not has_system_lib():
             download_library(self)
         super().run()
 
 
 class Develop(develop.develop):
     def run(self):
-        if not hasSYSTEM_lib():
+        if not has_system_lib():
             raise RuntimeError(
                 'This library is not usable in "develop" mode when using the '
                 f'bundled {LIB_NAME}. See README for details.'
@@ -93,7 +93,7 @@ class Develop(develop.develop):
 if _bdist_wheel:
     class BdistWheel(_bdist_wheel):
         def run(self):
-            if not hasSYSTEM_lib():
+            if not has_system_lib():
                 download_library(self)
             super().run()
 
@@ -112,14 +112,14 @@ class _BuildClib(build_clib.build_clib):
 
     def get_source_files(self):
         # Ensure library has been downloaded (sdist might have been skipped)
-        if not hasSYSTEM_lib():
+        if not has_system_lib():
             download_library(self)
 
         # This seems to create issues in MANIFEST.in
         return [f for _, _, fs in os.walk(absolute_from_setup_dir(LIB_NAME)) for f in fs]
 
     def run(self):
-        if hasSYSTEM_lib():
+        if has_system_lib():
             logging.info('Using system library')
             return
 
@@ -404,14 +404,14 @@ extension = Extension(
     extra_compile_args=['/d2FH4-'] if SYSTEM == 'Windows' else []
 )
 
-if hasSYSTEM_lib():
+if has_system_lib():
 
     class Distribution(_Distribution):
         def has_c_libraries(self):
-            return not hasSYSTEM_lib()
+            return not has_system_lib()
 
 
-    # TODO: This has not been tested yet. hasSYSTEM_lib() does not find conda install lib yet
+    # TODO: This has not been tested yet. has_system_lib() does not find conda install lib yet
     setup_kwargs = dict(
         setup_requires=['cffi>=1.3.0', 'requests'],
         ext_modules=[extension],
@@ -440,7 +440,7 @@ else:
 
         class Distribution(_Distribution):
             def has_c_libraries(self):
-                return not hasSYSTEM_lib()
+                return not has_system_lib()
 
 
         setup_kwargs = dict(
