@@ -151,7 +151,7 @@ jobs:
         if-no-files-found: error
 
   windows-wheels-x86_64:
-    name: Build Windows wheels
+    name: Build Windows wheels AMD64
     needs:
     - test
     runs-on: windows-latest
@@ -175,7 +175,7 @@ jobs:
         if-no-files-found: error
 
   windows-wheels-x86:
-    name: Build Windows wheels
+    name: Build Windows wheels x86
     needs:
     - test
     runs-on: windows-latest

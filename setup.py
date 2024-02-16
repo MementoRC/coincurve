@@ -218,7 +218,7 @@ class BuildClibWithCMake(_BuildClib):
 
             # Place the DLL directly in the package directory
             cmake_args.append('-DCMAKE_INSTALL_BINDIR=.')
-            cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), arch])
+            cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), f'-A{arch}'])
 
         elif SYSTEM == 'Darwin':
             if X_HOST is None:
