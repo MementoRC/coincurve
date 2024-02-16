@@ -20,8 +20,6 @@ sys.path.append(PACKAGE_SETUP_DIR)
 from setup_support import absolute_from_setup_dir, build_flags, detect_dll, download_library, has_system_lib, \
     execute_command_with_temp_log  # noqa: E402
 
-BUILDING_FOR_WINDOWS = detect_dll()
-
 MAKE = 'gmake' if platform.system() in ['FreeBSD', 'OpenBSD'] else 'make'
 PKGCONFIG = shutil.which('pkg-config')
 
@@ -395,6 +393,11 @@ class BuildCFFIExtension(_BuildCFFI):
     pass
 
 
+class Distribution(_Distribution):
+    def has_c_libraries(self):
+        return not has_system_lib()
+
+
 package_data = {PKG_NAME: ['py.typed']}
 
 extension = Extension(
@@ -405,11 +408,6 @@ extension = Extension(
 )
 
 if has_system_lib():
-
-    class Distribution(_Distribution):
-        def has_c_libraries(self):
-            return not has_system_lib()
-
 
     # TODO: This has not been tested yet. has_system_lib() does not find conda install lib yet
     setup_kwargs = dict(
@@ -426,35 +424,18 @@ if has_system_lib():
     )
 
 else:
-    if BUILDING_FOR_WINDOWS:
-
-        class Distribution(_Distribution):
-            def is_pure(self):
-                return False
-
-
-        package_data[PKG_NAME].append(f'{LIB_NAME}.dll')
-        setup_kwargs = {}
-
-    else:
-
-        class Distribution(_Distribution):
-            def has_c_libraries(self):
-                return not has_system_lib()
-
-
-        setup_kwargs = dict(
-            setup_requires=['cffi>=1.3.0', 'requests'],
-            ext_modules=[extension],
-            cmdclass={
-                'build_clib': BuildClibWithCMake,
-                'build_ext': BuildCFFIExtension,
-                'develop': Develop,
-                'egg_info': EggInfo,
-                'sdist': Sdist,
-                'bdist_wheel': BdistWheel if _bdist_wheel else None,
-            },
-        )
+    setup_kwargs = dict(
+        setup_requires=['cffi>=1.3.0', 'requests'],
+        ext_modules=[extension],
+        cmdclass={
+            'build_clib': BuildClibWithCMake,
+            'build_ext': BuildCFFIExtension,
+            'develop': Develop,
+            'egg_info': EggInfo,
+            'sdist': Sdist,
+            'bdist_wheel': BdistWheel if _bdist_wheel else None,
+        },
+    )
 
 
 def main():

@@ -17,7 +17,7 @@ concurrency:
 env:
   COINCURVE_UPSTREAM_REF: 1ad5185cd42c0636104129fcc9f6a4bf9c67cc40
   COINCURVE_IGNORE_SYSTEM_LIB: '1'
-  CIBW_BEFORE_ALL_MACOS: ./.github/scripts/install-macos-build-deps.sh
+  # CIBW_BEFORE_ALL_MACOS: ./.github/scripts/install-macos-build-deps.sh
   CIBW_ENVIRONMENT_PASS_LINUX: >
     COINCURVE_UPSTREAM_REF
     COINCURVE_IGNORE_SYSTEM_LIB
@@ -82,6 +82,31 @@ jobs:
 
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: wheelhouse/*.whl
+        if-no-files-found: error
+
+  linux-wheels-standard-system-lib:
+    name: Build Linux wheels
+    needs:
+    - test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.16.5
+      env:
+        COINCURVE_UPSTREAM_REF: '000'
+        COINCURVE_IGNORE_SYSTEM_LIB: '0'
+        CIBW_ENVIRONMENT_PASS_LINUX: >
+          COINCURVE_UPSTREAM_REF
+          COINCURVE_IGNORE_SYSTEM_LIB
+        CIBW_BEFORE_ALL_LINUX: conda install -y --no-progress --no-color libsecp256k1
 
     - uses: actions/upload-artifact@v3
       with:
