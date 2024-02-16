@@ -89,11 +89,11 @@ jobs:
         path: wheelhouse/*.whl
         if-no-files-found: error
 
-  linux-wheels-standard-system-lib:
-    name: Build Linux wheels (system lib from conda)
+  windows-wheels-standard-system-lib:
+    name: Build Windows wheels (system lib from conda)
     needs:
     - test
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -107,12 +107,14 @@ jobs:
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
       env:
-        COINCURVE_UPSTREAM_REF: '000'
+        COINCURVE_UPSTREAM_REF: '__no_upstream__'
         COINCURVE_IGNORE_SYSTEM_LIB: '0'
         CIBW_ENVIRONMENT_PASS_LINUX: >
           COINCURVE_UPSTREAM_REF
           COINCURVE_IGNORE_SYSTEM_LIB
-        CIBW_BEFORE_ALL_LINUX: conda install -y --no-progress --no-color libsecp256k1
+        CIBW_ARCHS_WINDOWS: "AMD64"
+        CIBW_BEFORE_ALL_WINDOWS: conda install libsecp256k1
+        CIBW_BUILD_VERBOSITY: 1
 
   macos-wheels-x86-64:
     name: Build macOS wheels
