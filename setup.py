@@ -17,7 +17,7 @@ except ImportError:
 
 PACKAGE_SETUP_DIR = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(PACKAGE_SETUP_DIR)
-from setup_support import absolute_from_setup_dir, build_flags, detect_dll, download_library, has_system_lib, \
+from setup_support import absolute_from_setup_dir, build_flags, detect_dll, download_library, hasSYSTEM_lib, \
     execute_command_with_temp_log  # noqa: E402
 
 BUILDING_FOR_WINDOWS = detect_dll()
@@ -38,13 +38,27 @@ TAR_NAME = f'secp256k1-{UPSTREAM_REF}'
 LIB_NAME = 'libsecp256k1'
 PKG_NAME = 'coincurve'
 
+# Helpers for compilation instructions
+# Cross-compile for Windows/ARM64, Linux/ARM64, Darwin/ARM64, Windows/x86 (GitHub)
+X_HOST = os.getenv('COINCURVE_CROSS_HOST')
+
+SYSTEM = platform.system()  # supported: Windows, Linux, Darwin
+MACHINE = platform.machine()  # supported: AMD64, x86_64
+
 _SECP256K1_BUILD_TYPE = 'SHARED'
+
+logging.info(
+    f'\nUname {platform.uname()}'
+    f'\n     system: {SYSTEM}'
+    f'\n    machine: {MACHINE}'
+    f'\n     x_host: {X_HOST}'
+)
 
 
 class EggInfo(egg_info.egg_info):
     def run(self):
         # Ensure library has been downloaded (sdist might have been skipped)
-        if not has_system_lib():
+        if not hasSYSTEM_lib():
             download_library(self)
 
         super().run()
@@ -53,7 +67,7 @@ class EggInfo(egg_info.egg_info):
 class DistInfo(dist_info.dist_info):
     def run(self):
         # Ensure library has been downloaded (sdist might have been skipped)
-        if not has_system_lib():
+        if not hasSYSTEM_lib():
             download_library(self)
 
         super().run()
@@ -61,14 +75,14 @@ class DistInfo(dist_info.dist_info):
 
 class Sdist(sdist.sdist):
     def run(self):
-        if not has_system_lib():
+        if not hasSYSTEM_lib():
             download_library(self)
         super().run()
 
 
 class Develop(develop.develop):
     def run(self):
-        if not has_system_lib():
+        if not hasSYSTEM_lib():
             raise RuntimeError(
                 'This library is not usable in "develop" mode when using the '
                 f'bundled {LIB_NAME}. See README for details.'
@@ -79,7 +93,7 @@ class Develop(develop.develop):
 if _bdist_wheel:
     class BdistWheel(_bdist_wheel):
         def run(self):
-            if not has_system_lib():
+            if not hasSYSTEM_lib():
                 download_library(self)
             super().run()
 
@@ -98,14 +112,14 @@ class _BuildClib(build_clib.build_clib):
 
     def get_source_files(self):
         # Ensure library has been downloaded (sdist might have been skipped)
-        if not has_system_lib():
+        if not hasSYSTEM_lib():
             download_library(self)
 
         # This seems to create issues in MANIFEST.in
         return [f for _, _, fs in os.walk(absolute_from_setup_dir(LIB_NAME)) for f in fs]
 
     def run(self):
-        if has_system_lib():
+        if hasSYSTEM_lib():
             logging.info('Using system library')
             return
 
@@ -174,7 +188,7 @@ class BuildClibWithCMake(_BuildClib):
         cmake_args = [
             '-DCMAKE_BUILD_TYPE=Release',
             f'-DCMAKE_INSTALL_PREFIX={install_lib_dir}',
-            f'-DCMAKE_C_FLAGS={"-fPIC" if _SECP256K1_BUILD_TYPE == "SHARED" and os.name != "nt" else ""}',
+            f'-DCMAKE_C_FLAGS={"-fPIC" if _SECP256K1_BUILD_TYPE == "SHARED" and SYSTEM != "Windows" else ""}',
             f'-DSECP256K1_DISABLE_SHARED={"OFF" if _SECP256K1_BUILD_TYPE == "SHARED" else "ON"}',
             '-DSECP256K1_BUILD_BENCHMARK=OFF',
             '-DSECP256K1_BUILD_TESTS=ON',
@@ -184,19 +198,8 @@ class BuildClibWithCMake(_BuildClib):
             '-DSECP256K1_ENABLE_MODULE_EXTRAKEYS=ON',
         ]
 
-        logging.info(f'    CMake for {platform.uname()}')
-        logging.info(f'      system: {platform.system()}')
-        logging.info(f'     os.name: {os.name}')
-        logging.info(f'     machine: {platform.machine()}')
-
-        _system = platform.system()   # supported: Windows, Linux, Darwin
-        _machine = platform.machine()   # supported: AMD64, x86_64
-
-        # Cross-compile for Windows/ARM64, Linux/ARM64, Darwin/ARM64
-        _x_host = os.environ.get('COINCURVE_CROSS_HOST')
-
         # Windows (more complex)
-        if _system == 'Windows':
+        if SYSTEM == 'Windows':
             vswhere = shutil.which('vswhere')
             msvc = execute_command_with_temp_log(
                 [vswhere, '-latest', '-find', 'MSBuild\\**\\Bin\\MSBuild.exe'],
@@ -204,28 +207,38 @@ class BuildClibWithCMake(_BuildClib):
             )
 
             # For windows x86/x64, select the correct architecture
-            arch = 'x64' if _machine == 'AMD64' else 'Win32'  # Native
+            arch = 'x64' if MACHINE == 'AMD64' else 'Win32'  # Native
 
-            if _x_host is not None:
-                if _x_host in ['arm64', 'x86']:
-                    arch = 'Win32' if _x_host == 'x86' else 'arm64'
+            if X_HOST is not None:
+                logging.info(f'Cross-compiling on {SYSTEM}:{MACHINE} for {X_HOST}')
+                if X_HOST in ['arm64', 'ARM64', 'x86']:
+                    arch = 'Win32' if X_HOST in ['x86'] else 'arm64'
                 else:
-                    raise NotImplementedError(f'Unsupported architecture: {_x_host}')
+                    raise NotImplementedError(f'Unsupported architecture: {X_HOST}')
 
             # Place the DLL directly in the package directory
             cmake_args.append('-DCMAKE_INSTALL_BINDIR=.')
             cmake_args.extend(['-G', BuildClibWithCMake._generator(msvc), arch])
 
-        elif _x_host is not None:
-            logging.info('Cross-compiling')
-            if platform.system() == 'Darwin' or platform.machine() == 'ARM64':
+        elif SYSTEM == 'Darwin':
+            if X_HOST is None:
+                # TODO: Investigate a universal build
                 cmake_args.append(
-                    f'-DCMAKE_OSX_ARCHITECTURES={_x_host}'
+                    f'-DCMAKE_OSX_ARCHITECTURES={MACHINE}'  # Native
                 )
             else:
-                # Note, only 2 toolchain files are provided (2/1/24)
+                logging.info(f'Cross-compiling on {SYSTEM}:{MACHINE} for {X_HOST}')
+                if X_HOST in ['armv7', 'armv7s', 'arm64', 'arm64e']:
+                    cmake_args.append(
+                        f'-DCMAKE_OSX_ARCHITECTURES={X_HOST}'
+                    )
+        else:
+            # Note, only 2 toolchain files are provided (2/1/24)
+            # TODO: Add support for other architectures
+            if X_HOST is not None and X_HOST not in ['arm-linux-gnueabihf', 'x86_64-w64-mingw32']:
+                logging.info(f'Cross-compiling on {SYSTEM}:{MACHINE} for {X_HOST}')
                 cmake_args.append(
-                    f'-DCMAKE_TOOLCHAIN_FILE=../cmake/{_x_host}.toolchain.cmake'
+                    f'-DCMAKE_TOOLCHAIN_FILE=../cmake/{X_HOST}.toolchain.cmake'
                 )
 
         logging.info('    Configure CMake')
@@ -298,26 +311,12 @@ class SharedLinker(object):
                     '-Wl,-rpath,$ORIGIN/lib64',
                 ])
         elif compiler.__class__.__name__ == 'MSVCCompiler':
-            vswhere = shutil.which('vswhere')
-            dumpbin = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
-                capture_output=True,
-            )
-            dumpbin = dumpbin.decode('utf-8', errors='ignore').strip()
-            logging.info(f'Using dumpin: {dumpbin}')
-
             for ld in libraries_dirs:
                 ld = ld.replace('/', '\\')
                 for lib in libraries:
                     lib_file = os.path.join(ld, f'lib{lib}.lib')
                     lib_path = [f'/LIBPATH:{ld}', f'lib{lib}.lib']
                     if os.path.exists(lib_file):
-                        logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
-                        export = execute_command_with_temp_log(
-                            [dumpbin, '-exports', lib_file],
-                            capture_output=True,
-                        )
-                        logging.info(f'exports: {export}')
                         extra_link_args.extend(lib_path)
         else:
             raise NotImplementedError(f'Unsupported compiler: {compiler.__class__.__name__}')
@@ -342,25 +341,11 @@ class StaticLinker(object):
                     extra_link_args.extend(['-Wl,-Bstatic', f'-l{lib}', '-Wl,-Bdynamic'])
 
         elif compiler.__class__.__name__ == 'MSVCCompiler':
-            vswhere = shutil.which('vswhere')
-            dumpbin = execute_command_with_temp_log(
-                [vswhere, '-latest', '-find', '**\\bin\\dumpbin.exe'],
-                capture_output=True,
-            )
-            dumpbin = dumpbin.decode('utf-8', errors='ignore').strip()
-            logging.info(f'Using dumpin: {dumpbin}')
-
             for ld in libraries_dirs:
                 ld = ld.replace('/', '\\')
                 for lib in libraries:
                     lib_file = os.path.join(ld, f'lib{lib}.lib')
                     if os.path.exists(lib_file):
-                        logging.info(f'    LIB: {lib_file}:{os.path.isfile(lib_file)}')
-                        export = execute_command_with_temp_log(
-                            [dumpbin, '-exports', lib_file],
-                            capture_output=True,
-                        )
-                        logging.info(f'exports: {export}')
                         extra_link_args.append(lib_file)
         else:
             raise NotImplementedError(f'Unsupported compiler: {compiler.__class__.__name__}')
@@ -376,14 +361,6 @@ class _BuildExtensionFromCFFI(build_ext.build_ext):
             SharedLinker.update_link_args(self.compiler, libraries, libraries_dirs, extra_link_args)
 
     def build_extension(self, ext):
-        logging.info(
-            f'Extension build:'
-            f'\n         OS:{os.name}'
-            f'\n   Platform:{sys.platform}'
-            f'\n   Compiler:{self.compiler.__class__.__name__}'
-            f'\n     Static:{self.static_lib}'
-        )
-
         # Enforce API interface
         ext.py_limited_api = False
 
@@ -391,8 +368,6 @@ class _BuildExtensionFromCFFI(build_ext.build_ext):
         c_lib_pkg = os.path.join(self.build_lib, 'coincurve', 'lib', 'pkgconfig')
 
         # PKG_CONFIG_PATH is updated by build_clib if built locally
-        # Do not override the CFFI C-file secp256k1.h with the one from the source distribution
-        # ext.include_dirs.extend(build_flags(LIB_NAME, 'I', c_lib_pkg))
         ext.extra_compile_args.extend([f'-I{build_flags(LIB_NAME, "I", c_lib_pkg)[0]}'])
         ext.library_dirs.extend(build_flags(LIB_NAME, 'L', c_lib_pkg))
 
@@ -408,16 +383,9 @@ class _BuildExtensionFromCFFI(build_ext.build_ext):
 
 class _BuildCFFI(_BuildExtensionFromCFFI):
     def build_extension(self, ext):
-        logging.info(
-            f'Cmdline CFFI build:'
-            f'\n     Source: {absolute_from_setup_dir(ext.sources[0])}'
-        )
-
         build_script = os.path.join('_cffi_build', 'build.py')
         for c_file in ext.sources:
-            logging.info(f'     Static: {self.static_lib}')
             cmd = [sys.executable, build_script, c_file, '1' if self.static_lib else '0']
-            logging.info(f'        CMD: {cmd}')
             execute_command_with_temp_log(cmd, debug=True)
 
         super().build_extension(ext)
@@ -433,17 +401,17 @@ extension = Extension(
     name=f'{PKG_NAME}._{LIB_NAME}',
     sources=[os.path.join(PKG_NAME, f'_{LIB_NAME}.c')],
     py_limited_api=False,
-    extra_compile_args=['/d2FH4-'] if sys.platform == 'win32' else []
+    extra_compile_args=['/d2FH4-'] if SYSTEM == 'Windows' else []
 )
 
-if has_system_lib():
+if hasSYSTEM_lib():
 
     class Distribution(_Distribution):
         def has_c_libraries(self):
-            return not has_system_lib()
+            return not hasSYSTEM_lib()
 
 
-    # TODO: This has not been tested yet. has_system_lib() does not find conda install lib yet
+    # TODO: This has not been tested yet. hasSYSTEM_lib() does not find conda install lib yet
     setup_kwargs = dict(
         setup_requires=['cffi>=1.3.0', 'requests'],
         ext_modules=[extension],
@@ -472,7 +440,7 @@ else:
 
         class Distribution(_Distribution):
             def has_c_libraries(self):
-                return not has_system_lib()
+                return not hasSYSTEM_lib()
 
 
         setup_kwargs = dict(
