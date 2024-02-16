@@ -130,6 +130,30 @@ jobs:
         path: wheelhouse/*.whl
         if-no-files-found: error
 
+  windows-wheels-x86_64:
+    name: Build Windows wheels
+    needs:
+    - test
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.16.5
+      env:
+        CIBW_ARCHS_WINDOWS: "AMD64"
+        CIBW_BUILD_VERBOSITY: 1
+        CIBW_BEFORE_ALL: choco install -y --no-progress --no-color cmake>=3.28 pkgconfiglite
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: wheelhouse/*.whl
+        if-no-files-found: error
+
   windows-wheels-x86:
     name: Build Windows wheels
     needs:
@@ -144,32 +168,8 @@ jobs:
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
       env:
+        COINCURVE_CROSS_HOST: "x86"
         CIBW_ARCHS_WINDOWS: "x86"
-        CIBW_BUILD_VERBOSITY: 1
-        CIBW_BEFORE_ALL: choco install -y --no-progress --no-color cmake>=3.28 pkgconfiglite
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: artifacts
-        path: wheelhouse/*.whl
-        if-no-files-found: error
-
-  windows-wheels-arm:
-    name: Build Windows wheels for ARM
-    needs:
-    - test
-    runs-on: windows-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - uses: actions/setup-python@v5
-
-    - name: Build wheels
-      uses: pypa/cibuildwheel@v2.16.5
-      env:
-        COINCURVE_CROSS_HOST: "ARM"
-        CIBW_ARCHS_WINDOWS: "ARM"
         CIBW_BUILD_VERBOSITY: 1
         CIBW_BEFORE_ALL: choco install -y --no-progress --no-color cmake>=3.28 pkgconfiglite
 
@@ -239,8 +239,8 @@ jobs:
     - linux-wheels-standard
     - macos-wheels-x86-64
     - macos-wheels-arm
+    - windows-wheels-x86_64
     - windows-wheels-x86
-    - windows-wheels-arm
     - windows-wheels-arm64
     - linux-wheels-arm64
     runs-on: ubuntu-latest

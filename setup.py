@@ -194,7 +194,6 @@ class BuildClibWithCMake(_BuildClib):
 
         # Cross-compile for Windows/ARM64, Linux/ARM64, Darwin/ARM64
         _x_host = os.environ.get('COINCURVE_CROSS_HOST')
-        _x_host = _x_host.upper() if _x_host else None
 
         # Windows (more complex)
         if _system == 'Windows':
@@ -205,9 +204,13 @@ class BuildClibWithCMake(_BuildClib):
             )
 
             # For windows x86/x64, select the correct architecture
-            arch = 'x64' if _machine == 'AMD64' else 'Win32'
-            if _x_host in ['ARM64', 'ARM']:
-                arch = _x_host  # can it be ARM
+            arch = 'x64' if _machine == 'AMD64' else 'Win32'  # Native
+
+            if _x_host is not None:
+                if _x_host in ['arm64', 'x86']:
+                    arch = 'Win32' if _x_host == 'x86' else 'arm64'
+                else:
+                    raise NotImplementedError(f'Unsupported architecture: {_x_host}')
 
             # Place the DLL directly in the package directory
             cmake_args.append('-DCMAKE_INSTALL_BINDIR=.')
