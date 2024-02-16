@@ -108,12 +108,6 @@ jobs:
           COINCURVE_IGNORE_SYSTEM_LIB
         CIBW_BEFORE_ALL_LINUX: conda install -y --no-progress --no-color libsecp256k1
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: artifacts
-        path: wheelhouse/*.whl
-        if-no-files-found: error
-
   macos-wheels-x86-64:
     name: Build macOS wheels
     needs:

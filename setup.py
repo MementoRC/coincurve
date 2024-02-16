@@ -17,7 +17,7 @@ except ImportError:
 
 PACKAGE_SETUP_DIR = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(PACKAGE_SETUP_DIR)
-from setup_support import absolute_from_setup_dir, build_flags, detect_dll, download_library, has_system_lib, \
+from setup_support import absolute_from_setup_dir, build_flags, download_library, has_system_lib, \
     execute_command_with_temp_log  # noqa: E402
 
 MAKE = 'gmake' if platform.system() in ['FreeBSD', 'OpenBSD'] else 'make'
