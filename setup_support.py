@@ -72,7 +72,6 @@ def _find_lib():
     if 'COINCURVE_IGNORE_SYSTEM_LIB' in os.environ and os.environ['COINCURVE_IGNORE_SYSTEM_LIB'] == '1':
         logging.info(
             f'Checking for system libsecp256k1 with {os.environ["COINCURVE_IGNORE_SYSTEM_LIB"]}:'
-            f'{os.environ["PKG_CONFIG_PATH"]}:{os.environ["LIB_DIR"]}:{os.environ["CONDA_PREFIX"]}'
         )
         return False
 
@@ -81,6 +80,10 @@ def _find_lib():
 
         # Update the environment CONDA_PREFIX to the current environment
         if 'CONDA_PREFIX' in os.environ:
+            logging.info(
+                f'Checking for system libsecp256k1 with '
+                f'{os.environ["PKG_CONFIG_PATH"]}:{os.environ["CONDA_PREFIX"]}'
+            )
             os.environ['PKG_CONFIG_PATH'] = (
                 os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig')
                 + ':'
