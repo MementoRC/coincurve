@@ -79,6 +79,7 @@ def _find_lib():
     try:
         from setup import PKGCONFIG
 
+        logging.info(f'DBG {os.environ}:')
         # Update the environment CONDA_PREFIX to the current environment
         if 'CONDA_PREFIX' in os.environ:
             os.environ['PKG_CONFIG_PATH'] = (
