@@ -70,9 +70,7 @@ def build_flags(library, type_, path='.'):
 
 def _find_lib():
     if 'COINCURVE_IGNORE_SYSTEM_LIB' in os.environ and os.environ['COINCURVE_IGNORE_SYSTEM_LIB'] == '1':
-        logging.info(
-            f'Checking for system libsecp256k1 with {os.environ["COINCURVE_IGNORE_SYSTEM_LIB"]}:'
-        )
+        logging.info(f'Checking for system libsecp256k1 with {os.environ["COINCURVE_IGNORE_SYSTEM_LIB"]}:')
         return False
 
     try:
