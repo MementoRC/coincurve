@@ -86,6 +86,7 @@ def _find_lib():
                 os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig')
                 + os.pathsep
                 + os.path.join(os.environ['CONDA_PREFIX'], 'Library', 'lib', 'pkgconfig')
+                + os.pathsep
                 + os.environ.get('PKG_CONFIG_PATH', '')
             )
             logging.info(
