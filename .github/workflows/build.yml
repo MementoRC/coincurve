@@ -112,7 +112,7 @@ jobs:
         CIBW_BEFORE_ALL_WINDOWS: >
           conda install -c conda-forge libsecp256k1 &&
           env | grep CONDA
-          ls -l "$CONDA_PREFIX"
+
         CIBW_BUILD_VERBOSITY: 1
 
   macos-wheels-x86-64:

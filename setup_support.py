@@ -55,7 +55,10 @@ def build_flags(library, type_, path='.'):
         pkg_config_path.append(os.environ['LIB_DIR'])
         pkg_config_path.append(os.path.join(os.environ['LIB_DIR'], 'pkgconfig'))
     if 'CONDA_PREFIX' in os.environ:
-        pkg_config_path.append(os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig'))
+        if SYSTEM == 'Windows':
+            pkg_config_path.append(os.path.join(os.environ['CONDA_PREFIX'], 'Library', 'lib', 'pkgconfig'))
+        else:
+            pkg_config_path.append(os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig'))
 
     options = {'I': '--cflags-only-I', 'L': '--libs-only-L', 'l': '--libs-only-l'}
     env = dict(os.environ, PKG_CONFIG_PATH=str(os.pathsep).join(pkg_config_path))
