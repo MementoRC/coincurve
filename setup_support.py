@@ -46,7 +46,7 @@ def absolute_from_setup_dir(*paths):
 
 def build_flags(library, type_, path='.'):
     """Return separated build flags from pkg-config output"""
-    from setup import PKGCONFIG
+    from setup import PKGCONFIG, SYSTEM
 
     pkg_config_path = [path]
     if 'PKG_CONFIG_PATH' in os.environ:
