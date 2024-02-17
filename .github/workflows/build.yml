@@ -100,9 +100,6 @@ jobs:
 
     - name: Install Miniconda
       uses: conda-incubator/setup-miniconda@v3
-      with:
-        activate-environment: true
-        python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
