@@ -232,15 +232,17 @@ class BuildClibWithCMake(_BuildClib):
                         f'-DCMAKE_OSX_ARCHITECTURES={X_HOST}'
                     )
         else:
-            # Note, only 2 toolchain files are provided (2/1/24)
-            # TODO: Add support for other architectures
-            if X_HOST is not None and X_HOST not in ['arm-linux-gnueabihf', 'x86_64-w64-mingw32']:
-                raise NotImplementedError(f'Unsupported architecture: {X_HOST}')
+            if X_HOST is not None:
+                if X_HOST not in [
+                    'arm-linux-gnueabihf',
+                    'x86_64-w64-mingw32',
+                ]:
+                    raise NotImplementedError(f'Unsupported architecture: {X_HOST}')
 
-            logging.info(f'Cross-compiling on {SYSTEM}:{MACHINE} for {X_HOST}')
-            cmake_args.append(
-                f'-DCMAKE_TOOLCHAIN_FILE=../cmake/{X_HOST}.toolchain.cmake'
-            )
+                logging.info(f'Cross-compiling on {SYSTEM}:{MACHINE} for {X_HOST}')
+                cmake_args.append(
+                    f'-DCMAKE_TOOLCHAIN_FILE=../cmake/{X_HOST}.toolchain.cmake'
+                )
 
         logging.info('    Configure CMake')
         execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args])
