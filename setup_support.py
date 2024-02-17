@@ -84,8 +84,7 @@ def _find_lib():
                 + os.environ.get('PKG_CONFIG_PATH', '')
             )
             logging.info(
-                f'Checking for system libsecp256k1 with '
-                f'{os.getenv("PKG_CONFIG_PATH")}:{os.environ["CONDA_PREFIX"]}'
+                f'Checking for system libsecp256k1 with ' f'{os.getenv("PKG_CONFIG_PATH")}:{os.environ["CONDA_PREFIX"]}'
             )
 
         logging.info(f'Checking for system libsecp256k1 with {os.environ["PKG_CONFIG_PATH"]}')
