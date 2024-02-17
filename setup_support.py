@@ -98,9 +98,7 @@ def _find_lib():
         return os.path.exists(os.path.join(includes[2:], 'secp256k1_ecdh.h'))
 
     except (OSError, subprocess.CalledProcessError) as e:
-        logging.info(
-            f'\n\nDBG:  ' f'{e}'
-        )
+        logging.info(f'\n\nDBG:  ' f'{e}')
         if 'LIB_DIR' in os.environ:
             from cffi import FFI
 
