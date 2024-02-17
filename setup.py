@@ -235,10 +235,12 @@ class BuildClibWithCMake(_BuildClib):
             # Note, only 2 toolchain files are provided (2/1/24)
             # TODO: Add support for other architectures
             if X_HOST is not None and X_HOST not in ['arm-linux-gnueabihf', 'x86_64-w64-mingw32']:
-                logging.info(f'Cross-compiling on {SYSTEM}:{MACHINE} for {X_HOST}')
-                cmake_args.append(
-                    f'-DCMAKE_TOOLCHAIN_FILE=../cmake/{X_HOST}.toolchain.cmake'
-                )
+                raise NotImplementedError(f'Unsupported architecture: {X_HOST}')
+
+            logging.info(f'Cross-compiling on {SYSTEM}:{MACHINE} for {X_HOST}')
+            cmake_args.append(
+                f'-DCMAKE_TOOLCHAIN_FILE=../cmake/{X_HOST}.toolchain.cmake'
+            )
 
         logging.info('    Configure CMake')
         execute_command_with_temp_log(['cmake', '-S', lib_src, '-B', build_temp, *cmake_args])
@@ -408,37 +410,19 @@ extension = Extension(
     extra_compile_args=['/d2FH4-'] if SYSTEM == 'Windows' else []
 )
 
-if has_system_lib():
-
-    # TODO: This has not been tested yet. has_system_lib() does not find conda install lib yet
-    setup_kwargs = dict(
-        setup_requires=['cffi>=1.3.0', 'requests'],
-        ext_modules=[extension],
-        cmdclass={
-            'build_clib': BuildClibWithCMake,
-            'build_ext': BuildCFFIExtension,
-            'develop': Develop,
-            'dist_info': DistInfo,
-            'egg_info': EggInfo,
-            'sdist': Sdist,
-            'bdist_wheel': BdistWheel if _bdist_wheel else None,
-        },
-    )
-
-else:
-    setup_kwargs = dict(
-        setup_requires=['cffi>=1.3.0', 'requests'],
-        ext_modules=[extension],
-        cmdclass={
-            'build_clib': BuildClibWithCMake,
-            'build_ext': BuildCFFIExtension,
-            'develop': Develop,
-            'dist_info': DistInfo,
-            'egg_info': EggInfo,
-            'sdist': Sdist,
-            'bdist_wheel': BdistWheel if _bdist_wheel else None,
-        },
-    )
+setup_kwargs = dict(
+    setup_requires=['cffi>=1.3.0', 'requests'],
+    ext_modules=[extension],
+    cmdclass={
+        'build_clib': BuildClibWithCMake,
+        'build_ext': BuildCFFIExtension,
+        'develop': Develop,
+        'dist_info': DistInfo,
+        'egg_info': EggInfo,
+        'sdist': Sdist,
+        'bdist_wheel': BdistWheel if _bdist_wheel else None,
+    },
+)
 
 
 def main():
