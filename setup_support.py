@@ -72,7 +72,6 @@ def build_flags(library, type_, path='.'):
 
 
 def _find_lib():
-    logging.info(f'\n\nDBG:_find_lib {os.environ}:')
     if 'COINCURVE_IGNORE_SYSTEM_LIB' in os.environ and os.environ['COINCURVE_IGNORE_SYSTEM_LIB'] == '1':
         logging.info(f'Checking for system libsecp256k1 with {os.environ["COINCURVE_IGNORE_SYSTEM_LIB"]}:')
         return False
@@ -98,7 +97,10 @@ def _find_lib():
 
         return os.path.exists(os.path.join(includes[2:], 'secp256k1_ecdh.h'))
 
-    except (OSError, subprocess.CalledProcessError):
+    except (OSError, subprocess.CalledProcessError) as e:
+        logging.info(
+            f'\n\nDBG:  ' f'{e}'
+        )
         if 'LIB_DIR' in os.environ:
             from cffi import FFI
 
