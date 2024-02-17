@@ -83,7 +83,8 @@ def _find_lib():
         if 'CONDA_PREFIX' in os.environ:
             os.environ['PKG_CONFIG_PATH'] = (
                 os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig')
-                + ':'
+                + os.pathsep
+                + os.path.join(os.environ['CONDA_PREFIX'], 'Library', 'lib', 'pkgconfig')
                 + os.environ.get('PKG_CONFIG_PATH', '')
             )
             logging.info(
@@ -142,8 +143,6 @@ def download_library(command, lib_dir='libsecp256k1', force=False):
     # _download will use shutil.move, thus remove the directory
     os.rmdir(lib_dir)
 
-    logging.info(f'Downloading {lib_dir} source code')
-
     from requests.exceptions import RequestException
 
     try:
@@ -166,6 +165,8 @@ def _download_library(lib_dir=None):
         except OSError:
             logging.info(f'Library directory {lib_dir} already exists')
             return
+
+    logging.info(f'Downloading {lib_dir} source code from: {LIB_TARBALL_URL}')
 
     r = requests.get(LIB_TARBALL_URL, stream=True, timeout=10, verify=True)
     status_code = r.status_code
