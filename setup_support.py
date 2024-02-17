@@ -78,14 +78,14 @@ def _find_lib():
 
         # Update the environment CONDA_PREFIX to the current environment
         if 'CONDA_PREFIX' in os.environ:
-            logging.info(
-                f'Checking for system libsecp256k1 with '
-                f'{os.environ["PKG_CONFIG_PATH"]}:{os.environ["CONDA_PREFIX"]}'
-            )
             os.environ['PKG_CONFIG_PATH'] = (
                 os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig')
                 + ':'
                 + os.environ.get('PKG_CONFIG_PATH', '')
+            )
+            logging.info(
+                f'Checking for system libsecp256k1 with '
+                f'{os.environ["PKG_CONFIG_PATH"]}:{os.environ["CONDA_PREFIX"]}'
             )
 
         logging.info(f'Checking for system libsecp256k1 with {os.environ["PKG_CONFIG_PATH"]}')
