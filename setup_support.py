@@ -87,8 +87,6 @@ def _find_lib():
                 f'Checking for system libsecp256k1 with ' f'{os.getenv("PKG_CONFIG_PATH")}:{os.environ["CONDA_PREFIX"]}'
             )
 
-        logging.info(f'Checking for system libsecp256k1 with {os.environ["PKG_CONFIG_PATH"]}')
-
         includes = subprocess.check_output([PKGCONFIG, '--cflags-only-I', 'libsecp256k1'])  # noqa S603
         includes = includes.strip().decode('utf-8')
 

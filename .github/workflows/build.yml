@@ -111,8 +111,8 @@ jobs:
         CIBW_BUILD: "cp312-win_amd64"
         CIBW_BEFORE_ALL_WINDOWS: >
           conda install -c conda-forge libsecp256k1 &&
-          echo $CONDA_PREFIX &&
-          ls $CONDA_PREFIX
+          echo $CONDA &&
+          ls $CONDA
         CIBW_BUILD_VERBOSITY: 1
 
   macos-wheels-x86-64:
