@@ -69,12 +69,11 @@ def build_flags(library, type_, path='.'):
 
 
 def _find_lib():
-    logging.info(
-        f'Checking for system libsecp256k1 with {os.environ["COINCURVE_IGNORE_SYSTEM_LIB"]}:'
-        f'{os.environ["PKG_CONFIG_PATH"]}:{os.environ["LIB_DIR"]}:{os.environ["CONDA_PREFIX"]}'
-    )
-
-    if 'COINCURVE_IGNORE_SYSTEM_LIB' in os.environ:
+    if 'COINCURVE_IGNORE_SYSTEM_LIB' in os.environ and os.environ['COINCURVE_IGNORE_SYSTEM_LIB'] == '1':
+        logging.info(
+            f'Checking for system libsecp256k1 with {os.environ["COINCURVE_IGNORE_SYSTEM_LIB"]}:'
+            f'{os.environ["PKG_CONFIG_PATH"]}:{os.environ["LIB_DIR"]}:{os.environ["CONDA_PREFIX"]}'
+        )
         return False
 
     try:
