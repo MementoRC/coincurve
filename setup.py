@@ -66,6 +66,7 @@ class DistInfo(dist_info.dist_info):
     def run(self):
         # Ensure library has been downloaded (sdist might have been skipped)
         if not has_system_lib():
+            logging.info('\n\nDistInfo')
             download_library(self)
 
         super().run()
@@ -414,7 +415,7 @@ if has_system_lib():
         setup_requires=['cffi>=1.3.0', 'requests'],
         ext_modules=[extension],
         cmdclass={
-            'build_clib': BuildClibWithMake,
+            'build_clib': BuildClibWithCMake,
             'build_ext': BuildCFFIExtension,
             'develop': Develop,
             'dist_info': DistInfo,
