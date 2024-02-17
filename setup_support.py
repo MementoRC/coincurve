@@ -114,6 +114,7 @@ _has_system_lib = None
 
 def has_system_lib():
     global _has_system_lib
+    logging.info(f'\n\nDBG:has_system_lib {os.environ}:')
     if _has_system_lib is None:
         _has_system_lib = _find_lib()
     return _has_system_lib
