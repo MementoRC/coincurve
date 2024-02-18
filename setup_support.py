@@ -103,7 +103,7 @@ def _find_lib():
                 f'{os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library", "lib", "pkgconfig"))}:'
             )
 
-        includes = subprocess.check_output([PKGCONFIG, '--cflags-only-I', 'libsecp256k1'])  # noqa S603
+        includes = subprocess.check_output([PKGCONFIG, '--cflags', '--libs', 'libsecp256k1'])  # noqa S603
         includes = includes.strip().decode('utf-8')
 
         logging.info(f'\n\nDBG:_find_lib includes:{includes}')
