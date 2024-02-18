@@ -94,6 +94,7 @@ def _find_lib():
             )
 
         logging.info(f'\n\nDBG:_find_lib {os.getenv("CONDA_PREFIX")}:')
+        logging.info(f'\n\nDBG:_find_lib {os.listdir(os.getenv("CONDA_PREFIX_1"))}:')
         logging.info(f'\n\nDBG:_find_lib {os.listdir(os.getenv("CONDA_PREFIX"))}:')
 
         includes = subprocess.check_output([PKGCONFIG, '--cflags-only-I', 'libsecp256k1'])  # noqa S603
