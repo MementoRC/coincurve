@@ -99,7 +99,8 @@ def _find_lib():
             logging.info(f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library"))}:')
             logging.info(f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library", "lib"))}:')
             logging.info(
-                f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library", "lib", "pkgconfig"))}:'
+                f'\n\nDBG:_find_lib '
+                f'{os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library", "lib", "pkgconfig"))}:'
             )
 
         includes = subprocess.check_output([PKGCONFIG, '--cflags-only-I', 'libsecp256k1'])  # noqa S603
