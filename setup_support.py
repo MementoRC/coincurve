@@ -107,10 +107,10 @@ def _find_lib():
         includes = includes.strip().decode('utf-8')
 
         logging.info(f'\n\nDBG:_find_lib includes:{includes}')
-        logging.info(f'\n\nDBG:_find_lib bin {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "include")) =}:')
+        logging.info(f'\n\nDBG:{os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library", "include")) =}:')
         logging.info(f'\n\nDBG:_find_lib bin {os.path.exists(os.path.join(includes[2:], "secp256k1_ecdh.h")) =}:')
 
-        return os.path.exists(os.path.join(includes[2:], 'secp256k1_ecdh.h'))
+        return os.path.exists(os.path.join(os.path.join(os.getenv("CONDA_PREFIX"), "Library", "include"), 'secp256k1_ecdh.h'))
 
     except (OSError, subprocess.CalledProcessError) as e:
         logging.info(f'\n\nDBG:  ' f'{e}')
