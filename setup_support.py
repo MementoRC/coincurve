@@ -93,14 +93,14 @@ def _find_lib():
                 f'Checking for system libsecp256k1 with ' f'{os.getenv("PKG_CONFIG_PATH")}:{os.environ["CONDA_PREFIX"]}'
             )
 
-        logging.info(f'\n\nDBG:_find_lib {os.getenv("CONDA_PREFIX")}:')
-        logging.info(f'\n\nDBG:_find_lib {os.listdir(os.getenv("CONDA_PREFIX"))}:')
-        logging.info(f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library"))}:')
-        logging.info(f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library"))}:')
-        logging.info(f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library", "lib"))}:')
-        logging.info(
-            f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library", "lib", "pkgconfig"))}:'
-        )
+            logging.info(f'\n\nDBG:_find_lib {os.getenv("CONDA_PREFIX")}:')
+            logging.info(f'\n\nDBG:_find_lib {os.listdir(os.getenv("CONDA_PREFIX"))}:')
+            logging.info(f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library"))}:')
+            logging.info(f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library"))}:')
+            logging.info(f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library", "lib"))}:')
+            logging.info(
+                f'\n\nDBG:_find_lib {os.listdir(os.path.join(os.getenv("CONDA_PREFIX"), "Library", "lib", "pkgconfig"))}:'
+            )
 
         includes = subprocess.check_output([PKGCONFIG, '--cflags-only-I', 'libsecp256k1'])  # noqa S603
         includes = includes.strip().decode('utf-8')
