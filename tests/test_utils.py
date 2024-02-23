@@ -1,6 +1,7 @@
 from os import urandom
 
 import pytest
+
 from coincurve.utils import (
     GROUP_ORDER,
     ZERO,

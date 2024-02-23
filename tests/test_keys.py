@@ -2,6 +2,7 @@ from hashlib import sha512
 from os import urandom
 
 import pytest
+
 from coincurve.ecdsa import deserialize_recoverable, recover
 from coincurve.keys import PrivateKey, PublicKey, PublicKeyXOnly
 from coincurve.utils import bytes_to_int, int_to_bytes_padded, verify_signature
