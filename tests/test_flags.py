@@ -1,4 +1,4 @@
-from coincurve.flags import (
+from coincurve import (
     CONTEXT_FLAGS,
     CONTEXT_NONE,
     EC_COMPRESSED,
