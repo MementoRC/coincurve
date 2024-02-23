@@ -110,11 +110,11 @@ jobs:
         CIBW_ARCHS_WINDOWS: "AMD64"
         CIBW_BUILD: "cp312-win_amd64"
         CIBW_BEFORE_ALL_WINDOWS: >
-          conda install -c conda-forge libsecp256k1 &&
+          conda install -c conda-forge libsecp256k1=hd590300_0 &&
           env | grep CONDA
         CIBW_TEST_REQUIRES: pytest pytest-benchmark
         CIBW_TEST_COMMAND: >
-          conda install -c conda-forge libsecp256k1 &&
+          conda install -c conda-forge libsecp256k1=hd590300_0 &&
           pytest {project}
 
         CIBW_BUILD_VERBOSITY: 1
