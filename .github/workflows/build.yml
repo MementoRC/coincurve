@@ -113,6 +113,12 @@ jobs:
           conda install -c conda-forge libsecp256k1
         CIBW_TEST_COMMAND: >
           conda install -c conda-forge libsecp256k1 pytest pytest-benchmark &&
+          python -c
+          "from coincurve import PrivateKey;
+          a=PrivateKey();
+          b=PrivateKey();
+          assert a.ecdh(b.public_key.format())==b.ecdh(a.public_key.format())
+          " &&
           pytest {project}
         CIBW_BUILD_VERBOSITY: 1
 
