@@ -23,10 +23,10 @@ def update_pkg_config_path(path='.'):
             [
                 p
                 for p in (
-                os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig'),
-                os.path.join(os.environ['CONDA_PREFIX'], 'lib64', 'pkgconfig'),
-                os.path.join(os.environ['CONDA_PREFIX'], 'Library', 'lib', 'pkgconfig'),
-            )
+                    os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig'),
+                    os.path.join(os.environ['CONDA_PREFIX'], 'lib64', 'pkgconfig'),
+                    os.path.join(os.environ['CONDA_PREFIX'], 'Library', 'lib', 'pkgconfig'),
+                )
                 if os.path.isdir(p)
             ]
         )
