@@ -23,10 +23,10 @@ def update_pkg_config_path(path='.'):
             [
                 p
                 for p in (
-                    os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig'),
-                    os.path.join(os.environ['CONDA_PREFIX'], 'lib64', 'pkgconfig'),
-                    os.path.join(os.environ['CONDA_PREFIX'], 'Library', 'lib', 'pkgconfig'),
-                )
+                os.path.join(os.environ['CONDA_PREFIX'], 'lib', 'pkgconfig'),
+                os.path.join(os.environ['CONDA_PREFIX'], 'lib64', 'pkgconfig'),
+                os.path.join(os.environ['CONDA_PREFIX'], 'Library', 'lib', 'pkgconfig'),
+            )
                 if os.path.isdir(p)
             ]
         )
@@ -108,8 +108,9 @@ def has_installed_libsecp256k1():
     # so we need to check the type of the installed library
     lib_dir = lib_dir[2:].strip()
     if SYSTEM == 'Windows':
-        no_lib_path = os.path.join(lib_dir[:-3], 'bin', f'{LIB_NAME[3:]}.dll')
-        lib_path = os.path.join(lib_dir[:-3], 'bin', f'{LIB_NAME}.dll')
+        # pkg-config on windows does not change the / into \\- May we need to use Path()?
+        no_lib_path = f'{lib_dir[:-3]}/bin/{LIB_NAME[3:]}.dll'
+        lib_path = f'{lib_dir[:-3]}/bin/{LIB_NAME}.dll'
         logging.warning(f'DBG: {no_lib_path = }, {lib_path = }')
         dyn_lib = any(
             (
