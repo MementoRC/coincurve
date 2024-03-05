@@ -111,11 +111,15 @@ def has_installed_libsecp256k1():
         from fnmatch import filter
 
         # Check if lib_dir contains a match for -*.dll
-        logging.warning(f'DBG: {lib_dir[:-4]}\\bin')
-        logging.warning(f'DBG: {LIB_NAME[3:]}*.dll')
-        logging.warning(os.listdir(f'{lib_dir[:-4]}\\bin'))
-        logging.warning(filter(os.listdir(f'{lib_dir[:-4]}\\bin'), f'*{LIB_NAME[3:]}*.dll'))
-        dyn_lib = any(True for _ in filter(os.listdir(f'{lib_dir[:-4]}\\bin'), f'*{LIB_NAME[3:]}*.dll'))
+        filtered_dyn = filter(os.listdir(lib_dir), f'*{LIB_NAME[3:]}*.dll')
+        logging.warning(filtered_dyn)
+        dyn_lib = any(True for _ in filtered_dyn)
+        if dyn_lib:
+            regsvr32 = os.path.join(
+                os.environ['SystemRoot'],
+                'System32' if os.environ['PROCESSOR_ARCHITECTURE'] == 'AMD64' else 'SysWOW64',
+                'regsvr32.exe')
+            [subprocess.run([regsvr32, '/s', lib], check=True) for lib in filtered_dyn]
     else:
         dyn_lib = any(
             (
