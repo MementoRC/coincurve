@@ -256,7 +256,8 @@ jobs:
         CIBW_TEST_COMMAND: >
             conda install -c conda-forge libsecp256k1 &&
             pkg-config --cflags --libs --dont-define-prefix libsecp256k1 &&
-            set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
+            dir %CONDA_PREFIX%\Library\bin &&
+            set PATH=%PATH%;%CONDA_PREFIX%\\Library\\bin &&
             python -c
             "from coincurve import PrivateKey;
             a=PrivateKey();
