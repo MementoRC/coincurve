@@ -109,8 +109,8 @@ def has_installed_libsecp256k1():
     lib_dir = lib_dir[2:].strip()
     if SYSTEM == 'Windows':
         # pkg-config on windows does not change the / into \\- May we need to use Path()?
-        no_lib_path = f'{lib_dir[:-3]}/bin/{LIB_NAME[3:]}.dll'.replace('/', '\\')
-        lib_path = f'{lib_dir[:-3]}/bin/{LIB_NAME}.dll'.replace('/', '\\')
+        no_lib_path = f'{lib_dir[:-4]}/bin/{LIB_NAME[3:]}.dll'.replace('/', '\\')
+        lib_path = f'{lib_dir[:-4]}/bin/{LIB_NAME}.dll'.replace('/', '\\')
         logging.warning(f'DBG: {no_lib_path = }, {lib_path = }')
         dyn_lib = any(
             (
