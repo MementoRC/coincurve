@@ -250,18 +250,16 @@ jobs:
             COINCURVE_SECP256K1_BUILD='SHARED'
         CIBW_BUILD: "cp312-win_amd64"
         CIBW_ARCHS_WINDOWS: "AMD64"
-        CIBW_BEFORE_ALL: conda install -c conda-forge pkg-config libsecp256k1
+        CIBW_BEFORE_ALL: >
+            conda install -c conda-forge pkg-config libsecp256k1 &&
+            regsvr32 /s %CONDA_PREFIX%\Library\bin\libsecp256k1-2.dll
         CIBW_BUILD_VERBOSITY: 1
         CIBW_TEST_REQUIRES: pytest pytest-benchmark
         CIBW_TEST_COMMAND: >
             conda install -c conda-forge libsecp256k1 &&
             pkg-config --cflags --libs --dont-define-prefix libsecp256k1 &&
-            copy %CONDA_PREFIX%\Library\bin\libsecp256k1-2.dll %CONDA_PREFIX%\Library\bin\libsecp256k1.dll &&
-            dir %CONDA_PREFIX%\Library\bin &&
             set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
-            regsvr32 /s %CONDA_PREFIX%\Library\bin\libsecp256k1.dll &&
             regsvr32 /s %CONDA_PREFIX%\Library\bin\libsecp256k1-2.dll &&
-            dir %CONDA_PREFIX%\Library\bin &&
             python -m pip list -v &&
             python -c
             "from coincurve import PrivateKey;
