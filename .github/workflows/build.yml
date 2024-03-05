@@ -257,7 +257,8 @@ jobs:
             conda install -c conda-forge libsecp256k1 &&
             pkg-config --cflags --libs --dont-define-prefix libsecp256k1 &&
             dir %CONDA_PREFIX%\Library\bin &&
-            set PATH=%PATH%;%CONDA_PREFIX%\\Library\\bin &&
+            copy %CONDA_PREFIX%\Library\bin\libsecp256k1-2.dll %CONDA_PREFIX%\Library\bin\libsecp256k1.dll &&
+            set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
             python -c
             "from coincurve import PrivateKey;
             a=PrivateKey();
