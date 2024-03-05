@@ -108,16 +108,10 @@ def has_installed_libsecp256k1():
     # so we need to check the type of the installed library
     lib_dir = lib_dir[2:].strip()
     if SYSTEM == 'Windows':
-        # pkg-config on windows does not change the / into \\- May we need to use Path()?
-        no_lib_path = f'{lib_dir[:-4]}/bin/{LIB_NAME[3:]}.dll'.replace('/', '\\')
-        lib_path = f'{lib_dir[:-4]}/bin/{LIB_NAME}.dll'.replace('/', '\\')
-        logging.warning(f'DBG: {no_lib_path = }, {lib_path = }')
-        dyn_lib = any(
-            (
-                os.path.exists(no_lib_path),
-                os.path.exists(lib_path),
-            )
-        )
+        from fnmatch import filter
+
+        # Check if lib_dir contains a match for -*.dll
+        dyn_lib = any(True for _ in filter(os.listdir(f'{lib_dir[:-4]}/bin'), f'{LIB_NAME[3:]}-*.dll'))
     else:
         dyn_lib = any(
             (
