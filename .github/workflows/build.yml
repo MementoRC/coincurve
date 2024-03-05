@@ -252,6 +252,7 @@ jobs:
         CIBW_ARCHS_WINDOWS: "AMD64"
         CIBW_BEFORE_ALL: >
             conda install -c conda-forge pkg-config libsecp256k1 &&
+            regsvr32 /s libsecp256k1-2.dll &&
             regsvr32 /s %CONDA_PREFIX%\Library\bin\libsecp256k1-2.dll
         CIBW_BUILD_VERBOSITY: 1
         CIBW_TEST_REQUIRES: pytest pytest-benchmark
