@@ -114,8 +114,8 @@ def has_installed_libsecp256k1():
         logging.warning(f'DBG: {lib_dir[:-4]}\\bin')
         logging.warning(f'DBG: {LIB_NAME[3:]}*.dll')
         logging.warning(os.listdir(f'{lib_dir[:-4]}\\bin'))
-        logging.warning(filter(os.listdir(f'{lib_dir[:-4]}\\bin'), f'{LIB_NAME[3:]}-*.dll'))
-        dyn_lib = any(True for _ in filter(os.listdir(f'{lib_dir[:-4]}\\bin'), f'{LIB_NAME[3:]}-*.dll'))
+        logging.warning(filter(os.listdir(f'{lib_dir[:-4]}\\bin'), f'*{LIB_NAME[3:]}*.dll'))
+        dyn_lib = any(True for _ in filter(os.listdir(f'{lib_dir[:-4]}\\bin'), f'*{LIB_NAME[3:]}*.dll'))
     else:
         dyn_lib = any(
             (
