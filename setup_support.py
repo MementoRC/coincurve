@@ -120,8 +120,10 @@ def has_installed_libsecp256k1():
                 'regsvr32.exe',
             )
             logging.warning(
-                [subprocess.run([regsvr32, '/s', os.path.join(lib_dir, lib)], check=True) for lib in filtered_dyn]
-            )  # S603
+                [
+                    subprocess.run([regsvr32, '/s', os.path.join(lib_dir, lib)]) for lib in filtered_dyn  # noqa S603
+                ]  # S603
+            )
     else:
         dyn_lib = any(
             (
