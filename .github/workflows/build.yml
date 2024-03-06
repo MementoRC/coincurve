@@ -256,6 +256,7 @@ jobs:
         CIBW_TEST_REQUIRES: pytest pytest-benchmark
         CIBW_TEST_COMMAND: >
             conda install -c conda-forge libsecp256k1 --force &&
+            conda activate base &&
             pkg-config --cflags --libs --dont-define-prefix libsecp256k1 &&
             set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
             C:\Windows\System32\regsvr32 /s %CONDA_PREFIX%\Library\bin\libsecp256k1-2.dll &&
