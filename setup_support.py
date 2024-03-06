@@ -119,7 +119,7 @@ def has_installed_libsecp256k1():
                 'System32' if os.environ['PROCESSOR_ARCHITECTURE'] == 'AMD64' else 'SysWOW64',
                 'regsvr32.exe',
             )
-            logging.warning([subprocess.run([regsvr32, '/s', lib], check=True) for lib in filtered_dyn])  # noqa S603
+            logging.warning([subprocess.run([regsvr32, '/s', os.path.join(lib_dir, lib)], check=True) for lib in filtered_dyn])  # noqa S603
     else:
         dyn_lib = any(
             (
