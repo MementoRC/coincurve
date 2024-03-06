@@ -112,6 +112,7 @@ def has_installed_libsecp256k1():
 
         # Check if lib_dir contains a match for -*.dll
         filtered_dyn = filter(os.listdir(lib_dir), f'*{LIB_NAME[3:]}*.dll')
+        logging.warning(os.listdir(lib_dir))
         logging.warning(filtered_dyn)
         dyn_lib = any(True for _ in filtered_dyn)
         if dyn_lib:
