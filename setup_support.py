@@ -111,7 +111,7 @@ def has_installed_libsecp256k1():
         from fnmatch import filter
 
         # Check if lib_dir contains a match for -*.dll
-        filtered_dyn = filter(os.listdir(f'{lib_dir[:-4]}\\bin'), f'*{LIB_NAME[3:]}*.dll')
+        filtered_dyn = filter(os.listdir(f'{lib_dir[:-3]}bin'), f'*{LIB_NAME[3:]}*.dll')
         dyn_lib = any(True for _ in filtered_dyn)
         if dyn_lib:
             regsvr32 = os.path.join(
