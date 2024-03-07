@@ -254,7 +254,7 @@ jobs:
             conda install -c conda-forge pkg-config libsecp256k1=0.4.1=ha55989b_3
         CIBW_BUILD_VERBOSITY: 1
         CIBW_TEST_COMMAND: >
-            conda install -c conda-forge libsecp256k1=0.4.1=h2372a71_3 pkg-config pytest pytest-benchmark&&
+            conda install -c conda-forge libsecp256k1=0.4.1=ha55989b_3 pkg-config pytest pytest-benchmark&&
             conda activate base &&
             set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
             set PKG_CONFIG_PATH=%PATH%;%CONDA_PREFIX%\Library\lib\pkgconfig &&
