@@ -1,6 +1,8 @@
+import os
 import sys
 
 import dlltracer
 
-with dlltracer.Trace(out=sys.stdout):
-    import coincurve._libsecp256k1  # noqa: F401
+if __name__ == "__main__" and os.name == 'nt':
+    with dlltracer.Trace(out=sys.stdout):
+        import coincurve._libsecp256k1  # noqa: F401
