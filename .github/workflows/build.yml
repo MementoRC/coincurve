@@ -251,14 +251,16 @@ jobs:
         CIBW_BUILD: "cp312-win_amd64"
         CIBW_ARCHS_WINDOWS: "AMD64"
         CIBW_BEFORE_ALL: >
-            conda install -c conda-forge pkg-config libsecp256k1=0.4.1=ha55989b_3
+            conda install -c conda-forge pkg-config libsecp256k1
         CIBW_BUILD_VERBOSITY: 1
         CIBW_TEST_COMMAND: >
-            conda install -c conda-forge libsecp256k1=0.4.1=ha55989b_3 pkg-config pytest pytest-benchmark&&
-            conda activate base &&
+            conda activate test &&
+            conda install -c conda-forge libsecp256k1 pkg-config pytest pytest-benchmark&&
             dir %CONDA_PREFIX%\Library\bin &&
             set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
             set PKG_CONFIG_PATH=%PATH%;%CONDA_PREFIX%\Library\lib\pkgconfig &&
+            pkg-config --cflags --libs --dont-define-prefix libsecp256k1 &&
+            C:\Windows\System32\regsvr32 /s %CONDA_PREFIX%\Library\bin\msvcp140.dll &&
             pkg-config --cflags --libs --dont-define-prefix libsecp256k1 &&
             C:\Windows\System32\regsvr32 /s %CONDA_PREFIX%\Library\bin\libsecp256k1-2.dll &&
             python -m pip list -v &&
