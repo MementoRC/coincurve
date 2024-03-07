@@ -255,8 +255,8 @@ jobs:
         CIBW_BUILD_VERBOSITY: 1
         CIBW_TEST_COMMAND: >
             conda activate test &&
-            conda install -c conda-forge libsecp256k1 pkg-config pytest pytest-benchmark &&
-            pytest {project}
+            conda install -c conda-forge libsecp256k1 pkg-config pytest pytest-benchmark dlltracer &&
+            pytest {project}/test_dll_tracer.py
         # dir %CONDA_PREFIX%\Library\bin &&
         # set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
         # set PKG_CONFIG_PATH=%PATH%;%CONDA_PREFIX%\Library\lib\pkgconfig &&
