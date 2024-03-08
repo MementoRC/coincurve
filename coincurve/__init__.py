@@ -23,7 +23,7 @@ def check_library():
     try:
         ctypes.CDLL(path_to_library)
     except Exception:
-        warnings.warn(f'The required library {LIBRARY_NAME} is not loaded.')
+        warnings.warn(f'The required library {LIBRARY_NAME} is not loaded.', stacklevel=2)
 
 
 # Call the function during initialization
