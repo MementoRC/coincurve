@@ -1,4 +1,8 @@
-from coincurve import PrivateKey, PublicKey, verify_signature
+from coincurve.utils import verify_signature
+
+from coincurve.keys import PublicKey
+
+from coincurve.keys import PrivateKey
 
 
 def test_verify_signature_util(benchmark, samples):
