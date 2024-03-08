@@ -258,7 +258,7 @@ jobs:
             conda activate test &&
             conda install -c conda-forge libsecp256k1 pkg-config pytest pytest-benchmark &&
             python {project}/tests/test_dll_tracer.py &&
-            python -m pytest {project}
+            pytest {project}
         # dir %CONDA_PREFIX%\Library\bin &&
         # set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
         # set PKG_CONFIG_PATH=%PATH%;%CONDA_PREFIX%\Library\lib\pkgconfig &&
