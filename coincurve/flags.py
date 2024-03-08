@@ -1,4 +1,4 @@
-from ._libsecp256k1 import lib
+from coincurve._libsecp256k1 import lib
 
 CONTEXT_NONE = lib.SECP256K1_CONTEXT_NONE
 CONTEXT_FLAGS = {
