@@ -253,6 +253,7 @@ jobs:
         CIBW_BEFORE_ALL: >
             conda install -c conda-forge pkg-config libsecp256k1
         CIBW_BUILD_VERBOSITY: 1
+        CIBW_TEST_EXTRAS_WINDOWS: dlltracer
         CIBW_TEST_COMMAND: >
             conda activate test &&
             conda install -c conda-forge libsecp256k1 pkg-config pytest pytest-benchmark dlltracer &&
