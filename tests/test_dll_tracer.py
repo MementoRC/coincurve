@@ -1,6 +1,5 @@
 import os
 import sys
-
 from ctypes import CDLL
 
 if __name__ == '__main__' and os.name == 'nt':
