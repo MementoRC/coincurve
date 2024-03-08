@@ -1,5 +1,6 @@
 import os
 import sys
+
 from _ctypes import dlopen
 
 if __name__ == '__main__' and os.name == 'nt':
