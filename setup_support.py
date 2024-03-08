@@ -139,4 +139,10 @@ def has_installed_libsecp256k1():
             f'Please ensure that the {SECP256K1_BUILD} library is installed.'
         )
         logging.warning(f'DBG:   {SYSTEM = }, {dyn_lib = }, {SECP256K1_BUILD = }, {found = }')
+
+    # Update coincurve._secp256k1_library_info
+    with open(absolute('coincurve', '_secp256k1_library_info.py'), 'w') as f:
+        f.write(f"SECP256K1_LIBRARY_NAME = '{LIB_NAME}'\n")
+        f.write("SECP256K1_LIBRARY_TYPE = 'EXTTERNAL'\n")
+
     return found
