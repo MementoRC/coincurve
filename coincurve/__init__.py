@@ -19,7 +19,11 @@ LIBRARY_NAME = 'libsecp256k1-2.dll'
 
 
 def check_library():
-    path_to_library = os.path.join(os.getenv('CONDA_PREFIX'), 'Library', 'bin', LIBRARY_NAME)
+    path_to_library = LIBRARY_NAME
+
+    if (conda := os.getenv('CONDA_PREFIX')) is not None:
+        path_to_library = os.path.join(conda, 'Library', 'bin', LIBRARY_NAME)
+
     try:
         ctypes.CDLL(path_to_library)
     except Exception:
