@@ -39,3 +39,7 @@ def load_secp256k1_conda_library():
         ctypes.CDLL(library)
     except Exception as e:
         warnings.warn(f'The required library {SECP256K1_LIBRARY_NAME}.so/dylib/dll is not loaded.\n{e}', stacklevel=2)
+
+
+# Load the library if it's a conda environment
+load_secp256k1_conda_library()
