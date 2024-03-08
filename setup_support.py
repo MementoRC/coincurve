@@ -146,5 +146,4 @@ def has_installed_libsecp256k1():
         f.write("SECP256K1_LIBRARY_TYPE = 'EXTTERNAL'\n")
         logging.warning(f'DBG:   {LIB_NAME = }')
 
-
     return found
