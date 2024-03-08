@@ -259,7 +259,12 @@ jobs:
             conda activate test &&
             conda install -c conda-forge libsecp256k1 pkg-config &&
             python {project}/tests/test_dll_tracer.py &&
-            pytest {project}
+            python -c
+            "from coincurve import PrivateKey;
+            a=PrivateKey();
+            b=PrivateKey();
+            assert a.ecdh(b.public_key.format())==b.ecdh(a.public_key.format())
+            "
         # dir %CONDA_PREFIX%\Library\bin &&
         # set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
         # set PKG_CONFIG_PATH=%PATH%;%CONDA_PREFIX%\Library\lib\pkgconfig &&
