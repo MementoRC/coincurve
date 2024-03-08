@@ -33,7 +33,6 @@ from coincurve.context import GLOBAL_CONTEXT, Context  # noqa: E402
 from coincurve.keys import PrivateKey, PublicKey, PublicKeyXOnly  # noqa: E402
 from coincurve.utils import verify_signature  # noqa: E402
 
-
 __all__ = [
     'GLOBAL_CONTEXT',
     'SECP256K1_LIBRARY_TYPE',

@@ -3,10 +3,9 @@ from hashlib import sha256 as _sha256
 from os import environ, urandom
 from typing import Generator
 
+from coincurve._libsecp256k1 import ffi, lib
 from coincurve.context import GLOBAL_CONTEXT, Context
 from coincurve.types import Hasher
-
-from coincurve._libsecp256k1 import ffi, lib
 
 GROUP_ORDER = (
     b'\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff'
