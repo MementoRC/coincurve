@@ -26,7 +26,7 @@ except ImportError:
     _bdist_wheel = None
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-from setup_support import absolute, call_pkg_config
+from setup_support import absolute, call_pkg_config, subprocess_run
 
 MAKE = 'gmake' if platform.system() in ['FreeBSD', 'OpenBSD'] else 'make'
 
@@ -209,7 +209,7 @@ class BuildClibWithCMake(_build_clib):
 
         # Verify installation
         # subprocess.check_call(['pkg-config', '--exists', LIB_NAME])  # S603
-        call_pkg_config(['--exists'], LIB_NAME, capture_output=True)
+        call_pkg_config(['--exists'], LIB_NAME)
 
     @staticmethod
     def _generator(msvc):
@@ -352,7 +352,7 @@ class BuildExtensionFromCFFI(_build_ext):
         else:
             SharedLinker.update_link_args(self.compiler, libraries, libraries_dirs, extra_link_args)
 
-    def build_extension(self, ext):
+    def create_c_files(self, ext):
         # Construct C-file from CFFI
         build_script = os.path.join('_cffi_build', 'build_shared.py')
         for i, c_file in enumerate(ext.sources):
@@ -361,7 +361,11 @@ class BuildExtensionFromCFFI(_build_ext):
             # This puts c-file a temp location (and not in the coincurve src directory)
             ext.sources[i] = c_file
             cmd = [sys.executable, build_script, c_file, '1' if self.static_lib else '0']
-            subprocess.check_call(cmd)  # noqa S603
+            subprocess_run(cmd)
+
+    def build_extension(self, ext):
+        # Construct C-file from CFFI
+        self.create_c_files(ext)
 
         # Enforce API interface
         ext.py_limited_api = False
@@ -431,7 +435,7 @@ class Distribution(_Distribution):
         update_pkg_config_path(path)
         options = {'I': '--cflags-only-I', 'L': '--libs-only-L', 'l': '--libs-only-l'}
         # flags = subprocess.check_output(['pkg-config', options[type_], '--dont-define-prefix', library])  # S603
-        flags = call_pkg_config([options[type_]], library, capture_output=True)
+        flags = call_pkg_config([options[type_]], library)
         flags = list(flags.split())
         return [flag.strip(f'-{type_}') for flag in flags]
 
