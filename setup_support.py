@@ -1,3 +1,4 @@
+import fnmatch
 import glob
 import logging
 import os
@@ -104,46 +105,25 @@ def has_installed_libsecp256k1():
         # We couldn't locate libsecp256k1, so we'll use the bundled one
         return False
 
-    # tox fails when the dynamic library is installed for a STATIC linkage,
-    # so we need to check the type of the installed library
+    # Verify that the installed library matches the build request (SHARED/STATIC)
     lib_dir = lib_dir[2:].strip()
     if SYSTEM == 'Windows':
-        from fnmatch import filter
-
-        # Check if lib_dir contains a match for -*.dll
-        filtered_dyn = filter(os.listdir(f'{lib_dir[:-3]}bin'), f'*{LIB_NAME[3:]}*.dll')
-        dyn_lib = any(True for _ in filtered_dyn)
-        if dyn_lib:
-            regsvr32 = os.path.join(
-                os.environ['SystemRoot'],
-                'System32' if os.environ['PROCESSOR_ARCHITECTURE'] == 'AMD64' else 'SysWOW64',
-                'regsvr32.exe',
-            )
-            logging.warning(
-                [
-                    subprocess.run([regsvr32, '/s', os.path.join(lib_dir, lib)]) for lib in filtered_dyn  # noqa S603
-                ]  # S603
-            )
+        filtered_dyn = fnmatch.filter(os.listdir(f'{lib_dir[:-3]}bin'), f'*{LIB_NAME[3:]}*.dll')
     else:
-        dyn_lib = any(
-            (
-                os.path.exists(os.path.join(lib_dir, f'{LIB_NAME}.so')),
-                os.path.exists(os.path.join(lib_dir, f'{LIB_NAME}.dylib')),
-            )
-        )
+        filtered_dyn = fnmatch.filter(os.listdir(lib_dir), f'{LIB_NAME}.[sd][oy]*')
 
+    dyn_lib = any(True for _ in filtered_dyn)
     found = any((dyn_lib and SECP256K1_BUILD == 'SHARED', not dyn_lib and SECP256K1_BUILD != 'SHARED'))
     if not found:
         logging.warning(
             f'WARNING: {LIB_NAME} is installed, but it is not the expected type. '
             f'Please ensure that the {SECP256K1_BUILD} library is installed.'
         )
-        logging.warning(f'DBG:   {SYSTEM = }, {dyn_lib = }, {SECP256K1_BUILD = }, {found = }')
 
-    # Update coincurve._secp256k1_library_info
-    with open(absolute('coincurve', '_secp256k1_library_info.py'), 'w') as f:
-        f.write(f"SECP256K1_LIBRARY_NAME = '{LIB_NAME}'\n")
-        f.write("SECP256K1_LIBRARY_TYPE = 'EXTERNAL'\n")
-        logging.warning(f'DBG:   {LIB_NAME = }')
+    if dyn_lib:
+        # Update coincurve._secp256k1_library_info
+        with open(absolute('coincurve', '_secp256k1_library_info.py'), 'w') as f:
+            f.write(f"SECP256K1_LIBRARY_NAME = '{filtered_dyn[0]}'\n")
+            f.write("SECP256K1_LIBRARY_TYPE = 'EXTERNAL'\n")
 
     return found
