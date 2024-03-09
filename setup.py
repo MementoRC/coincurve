@@ -197,19 +197,10 @@ class BuildClibWithCMake(_build_clib):
             self.get_source_files()
 
     def bc_update_pkg_config_path(self):
-        self.pkgconfig_dir = [
-            os.path.join(self._install_lib_dir, 'lib', 'pkgconfig'),
-            os.path.join(self._install_lib_dir, 'lib64', 'pkgconfig'),
-        ]
-        os.environ['PKG_CONFIG_PATH'] = (
-            f'{str(os.pathsep).join(self.pkgconfig_dir)}'
-            f'{os.pathsep}'
-            f'{os.getenv("PKG_CONFIG_PATH", "")}'
-        ).replace('\\', '/')
-
-        # Verify installation
-        # subprocess.check_call(['pkg-config', '--exists', LIB_NAME])  # S603
+        self.pkgconfig_dir = [os.path.join(self._install_lib_dir, n,  'pkgconfig') for n in ['lib', 'lib64']]
+        os.environ['PKG_CONFIG_PATH'] = os.pathsep.join(self.pkgconfig_dir + [os.getenv('PKG_CONFIG_PATH', '')])
         call_pkg_config(['--exists'], LIB_NAME)
+
 
     @staticmethod
     def _generator(msvc):

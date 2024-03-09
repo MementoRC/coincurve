@@ -153,7 +153,7 @@ def verify_system_lib(lib_dir):
         filtered_dyn = fnmatch.filter(os.listdir(lib_dir), f'{LIB_NAME}.[sd][oy]*')
 
     # Evaluates the dynamic libraries found,
-    logging.warnings(f'Found libraries: {filtered_dyn}')
+    logging.warning(f'Found libraries: {filtered_dyn}')
     dyn_lib = next((lib for lib in filtered_dyn if load_library(lib_dir, lib) is not None), False)
 
     found = any((dyn_lib and SECP256K1_BUILD == 'SHARED', not dyn_lib and SECP256K1_BUILD != 'SHARED'))
