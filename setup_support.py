@@ -43,7 +43,8 @@ def _find_lib():
         return False
 
     from cffi import FFI
-    from setup import LIB_NAME, SECP256K1_BUILD, SYSTEM
+
+    from setup import LIB_NAME
 
     update_pkg_config_path()
 
@@ -96,6 +97,7 @@ def subprocess_run(cmd, *, debug=False):
 def call_pkg_config(options, library, *, debug=False):
     """Calls pkg-config with the given options and returns the output."""
     import shutil
+
     from setup import SYSTEM
 
     if SYSTEM == 'Windows':
@@ -113,7 +115,8 @@ def has_installed_libsecp256k1():
         return False
 
     from cffi import FFI
-    from setup import LIB_NAME, SECP256K1_BUILD, SYSTEM
+
+    from setup import LIB_NAME
 
     update_pkg_config_path()
 
@@ -135,6 +138,7 @@ def verify_system_lib(lib_dir):
     """Verifies that the system library is installed and of the expected type."""
     import ctypes
     import fnmatch
+
     from setup import LIB_NAME, SECP256K1_BUILD, SYSTEM
 
     def load_library(d, lib):
