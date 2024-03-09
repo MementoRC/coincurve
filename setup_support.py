@@ -1,16 +1,11 @@
-import ctypes
-import fnmatch
 import glob
 import logging
 import os
-import shutil
 import subprocess
-import tempfile
 from contextlib import suppress
 
 
 def absolute(*paths):
-    """Returns the absolute path of a file or directory."""
     op = os.path
     return op.realpath(op.abspath(op.join(op.dirname(__file__), *paths)))
 
@@ -31,7 +26,7 @@ def update_pkg_config_path(path='.'):
 
 
 def build_flags(library, type_, path):
-    """Returns separated build flags from pkg-config output"""
+    """Return separated build flags from pkg-config output"""
 
     update_pkg_config_path(path)
 
@@ -43,8 +38,48 @@ def build_flags(library, type_, path):
     return [flag.strip(f'-{type_}') for flag in flags]
 
 
+def _find_lib():
+    if 'COINCURVE_IGNORE_SYSTEM_LIB' in os.environ:
+        return False
+
+    from cffi import FFI
+    from setup import LIB_NAME, SECP256K1_BUILD, SYSTEM
+
+    update_pkg_config_path()
+
+    try:
+        lib_dir = call_pkg_config(['--libs-only-L'], LIB_NAME)
+    except (OSError, subprocess.CalledProcessError):
+        if 'LIB_DIR' in os.environ:
+            for path in glob.glob(os.path.join(os.environ['LIB_DIR'], f'*{LIB_NAME[3:]}*')):
+                with suppress(OSError):
+                    FFI().dlopen(path)
+                    return True
+        # We couldn't locate libsecp256k1, so we'll use the bundled one
+        return False
+
+    return verify_system_lib(lib_dir[2:].strip())
+
+
+_has_system_lib = None
+
+
+def has_system_lib():
+    global _has_system_lib
+    if _has_system_lib is None:
+        _has_system_lib = _find_lib()
+    return _has_system_lib
+
+
+def detect_dll():
+    here = os.path.dirname(os.path.abspath(__file__))
+    for fn in os.listdir(os.path.join(here, 'coincurve')):
+        if fn.endswith('.dll'):
+            return True
+    return False
+
+
 def subprocess_run(cmd, *, debug=False):
-    """Runs a command and returns the output. Raises an exception if the command fails."""
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)  # noqa S603
         if debug:
@@ -60,6 +95,7 @@ def subprocess_run(cmd, *, debug=False):
 
 def call_pkg_config(options, library, *, debug=False):
     """Calls pkg-config with the given options and returns the output."""
+    import shutil
     from setup import SYSTEM
 
     if SYSTEM == 'Windows':
@@ -97,6 +133,8 @@ def has_installed_libsecp256k1():
 
 def verify_system_lib(lib_dir):
     """Verifies that the system library is installed and of the expected type."""
+    import ctypes
+    import fnmatch
     from setup import LIB_NAME, SECP256K1_BUILD, SYSTEM
 
     def load_library(d, lib):
