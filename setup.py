@@ -198,7 +198,8 @@ class BuildClibWithCMake(_build_clib):
 
     def bc_update_pkg_config_path(self):
         self.pkgconfig_dir = [os.path.join(self._install_lib_dir, n,  'pkgconfig') for n in ['lib', 'lib64']]
-        os.environ['PKG_CONFIG_PATH'] = os.pathsep.join(self.pkgconfig_dir + [os.getenv('PKG_CONFIG_PATH', '')])
+        self.pkgconfig_dir.append(os.getenv('PKG_CONFIG_PATH', ''))
+        os.environ['PKG_CONFIG_PATH'] = os.pathsep.join(self.pkgconfig_dir)
         call_pkg_config(['--exists'], LIB_NAME)
 
 
