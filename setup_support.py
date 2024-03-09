@@ -121,9 +121,10 @@ def has_installed_libsecp256k1():
         )
 
     if dyn_lib:
+        lib_base = filtered_dyn[0].split('.')[0]
         # Update coincurve._secp256k1_library_info
         with open(absolute('coincurve', '_secp256k1_library_info.py'), 'w') as f:
-            f.write(f"SECP256K1_LIBRARY_NAME = '{filtered_dyn[0]}'\n")
+            f.write(f"SECP256K1_LIBRARY_NAME = '{lib_base}'\n")
             f.write("SECP256K1_LIBRARY_TYPE = 'EXTERNAL'\n")
 
     return found
