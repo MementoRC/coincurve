@@ -349,8 +349,11 @@ class BuildExtensionFromCFFI(_build_ext):
 
         # Location of locally built library
         lib, inst_dir = define_secp256k1_local_lib_info()
+        logging.info(f'  Library: {lib} -> {inst_dir}')
         prefix = os.path.join(self.build_lib.replace('lib', inst_dir), lib)
+        logging.info(f'  {prefix = }')
         postfix = os.path.join('pkgconfig', f'{LIB_NAME}.pc')
+        logging.info(f'  {prefix = }')
 
         c_lib_pkg = None
         if not any([
