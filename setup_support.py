@@ -119,6 +119,7 @@ def update_pkg_config_path(path='.'):
     """Updates the PKG_CONFIG_PATH environment variable to include the given path."""
     pkg_config_paths = [path, os.getenv('PKG_CONFIG_PATH', '').strip('"')]
     logging.warning(f'env: {os.getenv("PKG_CONFIG_PATH")}')
+    logging.warning(f'conda: {os.getenv("CONDA_PREFIX")}')
 
     if cpf := os.getenv('CONDA_PREFIX'):
         conda_paths = [os.path.join(cpf, sbd, 'pkgconfig') for sbd in ('lib', 'lib64', os.path.join('Library', 'lib'))]
