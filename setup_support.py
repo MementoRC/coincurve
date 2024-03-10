@@ -129,6 +129,7 @@ def update_pkg_config_path(path='.'):
 def verify_system_lib(lib_dir):
     """Verifies that the system library is installed and of the expected type."""
     import ctypes
+    from ctypes.util import find_library
     from pathlib import Path
 
     from setup import LIB_NAME, PKG_NAME, SECP256K1_BUILD, SYSTEM
@@ -139,6 +140,7 @@ def verify_system_lib(lib_dir):
         except OSError:
             return None
 
+    logging.warning(f'find_library: {find_library(LIB_NAME[3:])}')
     lib_dir = Path(lib_dir).with_name('bin') if SYSTEM == 'Windows' else Path(lib_dir)
     lib_ext = '.dll' if SYSTEM == 'Windows' else '.[sd][oy]*'
     logging.warning(f'dir: {lib_dir}')
