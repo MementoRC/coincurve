@@ -26,7 +26,8 @@ except ImportError:
     _bdist_wheel = None
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-from setup_support import absolute, call_pkg_config, subprocess_run, has_system_lib, build_flags
+from setup_support import absolute, call_pkg_config, subprocess_run, has_system_lib, build_flags, \
+    define_secp256k1_local_lib_info
 
 MAKE = 'gmake' if platform.system() in ['FreeBSD', 'OpenBSD'] else 'make'
 

@@ -38,6 +38,7 @@ def _find_lib():
             for path in glob.glob(os.path.join(os.environ['LIB_DIR'], f'*{LIB_NAME[3:]}*')):
                 with suppress(OSError):
                     from cffi import FFI
+
                     FFI().dlopen(path)
                     return True
         # We couldn't locate libsecp256k1, so we'll use the bundled one
@@ -99,7 +100,7 @@ def define_secp256k1_local_lib_info():
     The purpose is to automatically include the shared library in the package and
     prevent inclusion the static library. This is probably hacky, but it works.
     """
-    from setup import SECP256K1_BUILD, LIB_NAME, PKG_NAME
+    from setup import LIB_NAME, PKG_NAME, SECP256K1_BUILD
 
     if SECP256K1_BUILD == 'SHARED':
         logging.info('Building shared library')
