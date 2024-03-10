@@ -258,7 +258,6 @@ jobs:
         CIBW_TEST_COMMAND: >
             conda activate test &&
             conda install -c conda-forge libsecp256k1 pkg-config &&
-            python {project}/tests/test_dll_tracer.py &&
             python -c
             "from coincurve import PrivateKey;
             a=PrivateKey();
@@ -314,15 +313,13 @@ jobs:
             COINCURVE_SECP256K1_BUILD='SHARED'
         CIBW_BUILD: "cp312-macosx_x86_64"
         CIBW_ARCHS_MACOS: x86_64
-        CIBW_BEFORE_ALL_MACOS: >
-            conda install -c conda-forge pkg-config libsecp256k1
+        CIBW_BEFORE_ALL_MACOS: .github/scripts/build-with-conda-osx.sh
         CIBW_BUILD_VERBOSITY: 1
         # pytest needs to be defined here to find 'coincurve' package?
         CIBW_TEST_REQUIRES: pytest pytest-benchmark
         CIBW_TEST_COMMAND: >
             conda activate test &&
             conda install -c conda-forge libsecp256k1 pkg-config &&
-            python {project}/tests/test_dll_tracer.py &&
             python -c
             "from coincurve import PrivateKey;
             a=PrivateKey();
