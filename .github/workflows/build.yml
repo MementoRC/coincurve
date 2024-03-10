@@ -286,11 +286,11 @@ jobs:
 
 
 
-  macoss-wheels-conda-x86_64:
+  macoss-wheels-conda-arm64:
     name: Build macOS (CONDA) wheels AMD64
     needs:
     - test
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
     - uses: actions/checkout@v4
@@ -300,6 +300,9 @@ jobs:
       with:
         python-version: '3.12'
 
+    - name: Install Miniconda
+      uses: conda-incubator/setup-miniconda@v3
+
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.16.5
       env:
@@ -307,10 +310,10 @@ jobs:
             COINCURVE_IGNORE_SYSTEM_LIB="0"
             COINCURVE_UPSTREAM_REF="__no_tag__"
             COINCURVE_SECP256K1_BUILD='SHARED'
-        CIBW_BUILD: "cp312-macosx_x86_64"
-        CIBW_ARCHS_MACOS: x86_64
+        CIBW_BUILD: "cp312-macosx_arm64"
         # CIBW_BEFORE_BUILD_MACOS: ./.github/scripts/build-with-conda-osx.shconda-forge libsecp256k1 pkg-config
-        CIBW_BEFORE_BUILD_MACOS: conda install -c conda-forge libsecp256k1 pkg-config && export CONDA_PREFIX
+        # CONDA is not passed to the
+        CIBW_BEFORE_BUILD_MACOS: conda install -c conda-forge libsecp256k1 pkg-confi
         CIBW_BUILD_VERBOSITY: 1
         # pytest needs to be defined here to find 'coincurve' package?
         CIBW_TEST_REQUIRES: pytest pytest-benchmark
