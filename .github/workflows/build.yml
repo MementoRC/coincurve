@@ -24,7 +24,7 @@ env:
     COINCURVE_IGNORE_SYSTEM_LIB
     COINCURVE_SECP256K1_BUILD
   CIBW_PROJECT_REQUIRES_PYTHON: ">=3.8"
-  CIBW_BEFORE_ALL_MACOS: ./.github/scripts/install-macos-build-deps.sh
+  CIBW_BEFORE_BUILD_MACOS: ./.github/scripts/install-macos-build-deps.sh
   CIBW_TEST_REQUIRES: pytest pytest-benchmark
   CIBW_TEST_COMMAND: >
     python -c
