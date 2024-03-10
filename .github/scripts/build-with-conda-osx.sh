@@ -47,3 +47,5 @@ export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
 mamba install --update-specs --quiet --yes --channel conda-forge libsecp256k1 pkg-config
 
 ( endgroup "Configuring conda" ) 2> /dev/null
+
+python -m pip wheel .
