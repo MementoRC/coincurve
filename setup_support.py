@@ -93,6 +93,24 @@ def call_pkg_config(options, library, *, debug=False):
     return subprocess_run(cmd, debug=debug)
 
 
+def define_secp256k1_local_lib_info():
+    """
+    Define the library name and the installation directory
+    The purpose is to automatically include the shared library in the package and
+    prevent inclusion the static library. This is probably hacky, but it works.
+    """
+    from setup import SECP256K1_BUILD, LIB_NAME, PKG_NAME
+
+    if SECP256K1_BUILD == 'SHARED':
+        logging.info('Building shared library')
+        # This will place the shared library inside the coincurve package data
+        return PKG_NAME, 'lib'
+
+    logging.info('Building static library')
+    # This will place the static library in a separate x_lib and in a lib_name directory
+    return LIB_NAME, 'x_lib'
+
+
 def update_pkg_config_path(path='.'):
     """Updates the PKG_CONFIG_PATH environment variable to include the given path."""
     pkg_config_paths = [path, os.getenv('PKG_CONFIG_PATH', '').strip('"')]

@@ -59,22 +59,6 @@ if [int(i) for i in setuptools_version.split('.', 2)[:2]] < [3, 3]:
     )
 
 
-def define_secp256k1_local_lib_info():
-    """
-    Define the library name and the installation directory
-    The purpose is to automatically include the shared library in the package and
-    prevent inclusion the static library. This is probably hacky, but it works.
-    """
-    if SECP256K1_BUILD == 'SHARED':
-        logging.info('Building shared library')
-        # This will place the shared library inside the coincurve package data
-        return PKG_NAME, 'lib'
-
-    logging.info('Building static library')
-    # This will place the static library in a separate x_lib and in a lib_name directory
-    return LIB_NAME, 'x_lib'
-
-
 def download_library(command):
     if command.dry_run:
         return
