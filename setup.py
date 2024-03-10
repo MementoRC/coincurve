@@ -542,76 +542,39 @@ class BuildCFFIForSharedLib(_build_ext):
 
         super().build_extension(ext)
 
-
-if has_system_lib():
-
-    class Distribution(_Distribution):
-        def has_c_libraries(self):
-            return not has_system_lib()
-
-
-    # --- SECP256K1 package definitions ---
-    secp256k1_package = 'libsecp256k1'
-
-    extension = Extension(
-        name='coincurve._libsecp256k1',
-        sources=[os.path.join('coincurve', '_libsecp256k1.c')],
-        # ABI?: py_limited_api=True,
-    )
-
-    extension.extra_compile_args = [
-        subprocess.check_output(['pkg-config', '--cflags-only-I', 'libsecp256k1']).strip().decode('utf-8')  # noqa S603
-    ]
-    extension.extra_link_args = [
-        subprocess.check_output(['pkg-config', '--libs-only-L', 'libsecp256k1']).strip().decode('utf-8'),  # noqa S603
-        subprocess.check_output(['pkg-config', '--libs-only-l', 'libsecp256k1']).strip().decode('utf-8'),  # noqa S603
-    ]
-
-    if os.name == 'nt' or sys.platform == 'win32':
-        # Apparently, the linker on Windows interprets -lxxx as xxx.lib, not libxxx.lib
-        for i, v in enumerate(extension.__dict__.get('extra_link_args')):
-            extension.__dict__['extra_link_args'][i] = v.replace('-L', '/LIBPATH:')
-
-            if v.startswith('-l'):
-                v = v.replace('-l', 'lib')
-                extension.__dict__['extra_link_args'][i] = f'{v}.lib'
-
-    setup_kwargs = dict(
-        ext_modules=[extension],
-        cmdclass={
-            'build_clib': None if has_system_lib() else BuildClibWithCMake,
-            'build_ext': BuildCFFIForSharedLib,
-            'develop': develop,
-            'egg_info': egg_info,
-            'sdist': sdist,
-            'bdist_wheel': bdist_wheel,
-        },
-    )
-
-else:
-    if BUILDING_FOR_WINDOWS:
-
-        class Distribution(_Distribution):
-            def is_pure(self):
-                return False
-
-
-        package_data['coincurve'].append('libsecp256k1.dll')
-        setup_kwargs = {}
-
-    else:
+def main():
+    if has_system_lib():
 
         class Distribution(_Distribution):
             def has_c_libraries(self):
                 return not has_system_lib()
 
 
+        # --- SECP256K1 package definitions ---
+        secp256k1_package = 'libsecp256k1'
+
         extension = Extension(
             name='coincurve._libsecp256k1',
-            sources=['_c_file_for_extension.c'],
-            py_limited_api=False,
-            extra_compile_args=['/d2FH4-'] if SYSTEM == 'Windows' else [],
+            sources=[os.path.join('coincurve', '_libsecp256k1.c')],
+            # ABI?: py_limited_api=True,
         )
+
+        extension.extra_compile_args = [
+            subprocess.check_output(['pkg-config', '--cflags-only-I', 'libsecp256k1']).strip().decode('utf-8')  # noqa S603
+        ]
+        extension.extra_link_args = [
+            subprocess.check_output(['pkg-config', '--libs-only-L', 'libsecp256k1']).strip().decode('utf-8'),  # noqa S603
+            subprocess.check_output(['pkg-config', '--libs-only-l', 'libsecp256k1']).strip().decode('utf-8'),  # noqa S603
+        ]
+
+        if os.name == 'nt' or sys.platform == 'win32':
+            # Apparently, the linker on Windows interprets -lxxx as xxx.lib, not libxxx.lib
+            for i, v in enumerate(extension.__dict__.get('extra_link_args')):
+                extension.__dict__['extra_link_args'][i] = v.replace('-L', '/LIBPATH:')
+
+                if v.startswith('-l'):
+                    v = v.replace('-l', 'lib')
+                    extension.__dict__['extra_link_args'][i] = f'{v}.lib'
 
         setup_kwargs = dict(
             ext_modules=[extension],
@@ -625,55 +588,96 @@ else:
             },
         )
 
-setup(
-    name='coincurve',
-    version='19.0.1',
+    else:
+        if BUILDING_FOR_WINDOWS:
 
-    description='Cross-platform Python CFFI bindings for libsecp256k1',
-    long_description=open('README.md', 'r').read(),
-    long_description_content_type='text/markdown',
-    author_email='Ofek Lev <oss@ofek.dev>',
-    license='MIT OR Apache-2.0',
+            class Distribution(_Distribution):
+                def is_pure(self):
+                    return False
 
-    python_requires='>=3.8',
-    install_requires=['asn1crypto', 'cffi>=1.3.0'],
 
-    packages=find_packages(exclude=('_cffi_build', '_cffi_build.*', 'libsecp256k1', 'tests')),
-    package_data=package_data,
+            package_data['coincurve'].append('libsecp256k1.dll')
+            setup_kwargs = {}
 
-    distclass=Distribution,
-    zip_safe=False,
+        else:
 
-    project_urls={
-        'Documentation': 'https://ofek.dev/coincurve/',
-        'Issues': 'https://github.com/ofek/coincurve/issues',
-        'Source': 'https://github.com/ofek/coincurve',
-    },
-    keywords=[
-        'secp256k1',
-        'crypto',
-        'elliptic curves',
-        'bitcoin',
-        'ethereum',
-        'cryptocurrency',
-    ],
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'License :: OSI Approved :: Apache Software License',
-        'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Topic :: Software Development :: Libraries',
-        'Topic :: Security :: Cryptography',
-    ],
-    **setup_kwargs
-)
+            class Distribution(_Distribution):
+                def has_c_libraries(self):
+                    return not has_system_lib()
+
+
+            extension = Extension(
+                name='coincurve._libsecp256k1',
+                sources=['_c_file_for_extension.c'],
+                py_limited_api=False,
+                extra_compile_args=['/d2FH4-'] if SYSTEM == 'Windows' else [],
+            )
+
+            setup_kwargs = dict(
+                ext_modules=[extension],
+                cmdclass={
+                    'build_clib': None if has_system_lib() else BuildClibWithCMake,
+                    'build_ext': BuildCFFIForSharedLib,
+                    'develop': develop,
+                    'egg_info': egg_info,
+                    'sdist': sdist,
+                    'bdist_wheel': bdist_wheel,
+                },
+            )
+
+    setup(
+        name='coincurve',
+        version='19.0.1',
+
+        description='Cross-platform Python CFFI bindings for libsecp256k1',
+        long_description=open('README.md', 'r').read(),
+        long_description_content_type='text/markdown',
+        author_email='Ofek Lev <oss@ofek.dev>',
+        license='MIT OR Apache-2.0',
+
+        python_requires='>=3.8',
+        install_requires=['asn1crypto', 'cffi>=1.3.0'],
+
+        packages=find_packages(exclude=('_cffi_build', '_cffi_build.*', 'libsecp256k1', 'tests')),
+        package_data=package_data,
+
+        distclass=Distribution,
+        zip_safe=False,
+
+        project_urls={
+            'Documentation': 'https://ofek.dev/coincurve/',
+            'Issues': 'https://github.com/ofek/coincurve/issues',
+            'Source': 'https://github.com/ofek/coincurve',
+        },
+        keywords=[
+            'secp256k1',
+            'crypto',
+            'elliptic curves',
+            'bitcoin',
+            'ethereum',
+            'cryptocurrency',
+        ],
+        classifiers=[
+            'Development Status :: 5 - Production/Stable',
+            'Intended Audience :: Developers',
+            'License :: OSI Approved :: MIT License',
+            'License :: OSI Approved :: Apache Software License',
+            'Natural Language :: English',
+            'Operating System :: OS Independent',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
+            'Programming Language :: Python :: 3.10',
+            'Programming Language :: Python :: 3.11',
+            'Programming Language :: Python :: 3.12',
+            'Programming Language :: Python :: Implementation :: CPython',
+            'Programming Language :: Python :: Implementation :: PyPy',
+            'Topic :: Software Development :: Libraries',
+            'Topic :: Security :: Cryptography',
+        ],
+        **setup_kwargs
+    )
+
+
+if __name__ == '__main__':
+    main()
