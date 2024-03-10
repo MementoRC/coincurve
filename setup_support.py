@@ -148,9 +148,11 @@ def verify_system_lib(lib_dir):
             return None
 
     if SYSTEM == 'Windows':
-        filtered_dyn = fnmatch.filter(os.listdir(f'{lib_dir[:-3]}bin'), f'*{LIB_NAME[3:]}*.dll')
+        lib_dir. lib_ext = f'{lib_dir[:-3]}bin', '.dll'
     else:
-        filtered_dyn = fnmatch.filter(os.listdir(lib_dir), f'{LIB_NAME}.[sd][oy]*')
+        lib_dir. lib_ext = lib_dir, '.[sd][oy]*'
+
+    filtered_dyn = fnmatch.filter(os.listdir(lib_dir), f'{LIB_NAME}{lib_ext}')
 
     # Evaluates the dynamic libraries found,
     logging.warning(f'Found libraries: {filtered_dyn}')
