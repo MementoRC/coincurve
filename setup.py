@@ -26,7 +26,7 @@ except ImportError:
     _bdist_wheel = None
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-from setup_support import absolute, call_pkg_config, subprocess_run
+from setup_support import absolute, call_pkg_config, subprocess_run, has_system_lib, build_flags
 
 MAKE = 'gmake' if platform.system() in ['FreeBSD', 'OpenBSD'] else 'make'
 
@@ -106,9 +106,9 @@ def download_library(command):
 
 class egg_info(_egg_info):
     def run(self):
-        logging.info(f'   egg_info:{self.distribution.uses_system_lib() = }')
+        logging.info(f'   egg_info:{has_system_lib() = }')
         # Ensure library has been downloaded (sdist might have been skipped)
-        if not self.distribution.uses_system_lib():
+        if not has_system_lib():
             download_library(self)
 
         _egg_info.run(self)
@@ -117,7 +117,7 @@ class egg_info(_egg_info):
 class dist_info(_dist_info):
     def run(self):
         # Ensure library has been downloaded (sdist might have been skipped)
-        if not self.distribution.uses_system_lib():
+        if not has_system_lib():
             download_library(self)
 
         _dist_info.run(self)
@@ -125,7 +125,7 @@ class dist_info(_dist_info):
 
 class sdist(_sdist):
     def run(self):
-        if not self.distribution.uses_system_lib():
+        if not has_system_lib():
             download_library(self)
         _sdist.run(self)
 
@@ -134,7 +134,7 @@ if _bdist_wheel:
 
     class bdist_wheel(_bdist_wheel):
         def run(self):
-            if not self.distribution.uses_system_lib():
+            if not has_system_lib():
                 download_library(self)
             _bdist_wheel.run(self)
 
@@ -157,14 +157,14 @@ class BuildClibWithCMake(_build_clib):
 
     def get_source_files(self):
         # Ensure library has been downloaded (sdist might have been skipped)
-        if not self.distribution.uses_system_lib():
+        if not has_system_lib():
             download_library(self)
 
         # This seems to create issues in MANIFEST.in
         return [f for _, _, fs in os.walk(absolute(LIB_NAME)) for f in fs]
 
     def run(self):
-        if self.distribution.uses_system_lib():
+        if has_system_lib():
             logging.info('Using system library')
             return
 
@@ -371,17 +371,16 @@ class BuildExtensionFromCFFI(_build_ext):
         if not any([
             os.path.isfile(c_lib_pkg := os.path.join(prefix, 'lib', postfix)),
             os.path.isfile(c_lib_pkg := os.path.join(prefix, 'lib64', postfix)),
-            self.distribution.uses_system_lib()
+            has_system_lib()
         ]):
             raise RuntimeError(
                 f'Library not found: {os.path.join(prefix, "lib/lib64", postfix)}'
-                f'\nSystem lib is {self.distribution.uses_system_lib() = }. '
+                f'\nSystem lib is {has_system_lib() = }. '
                 'Please check that the library was properly built.'
             )
 
         # PKG_CONFIG_PATH is updated by build_clib if built locally,
         # however, it would not work for a step-by-step build, thus we specify the lib path
-        build_flags = self.distribution.build_flags
         ext.extra_compile_args.extend([f'-I{build_flags(LIB_NAME, "I", c_lib_pkg)[0]}'])
         ext.library_dirs.extend(build_flags(LIB_NAME, 'L', c_lib_pkg))
 
@@ -397,7 +396,7 @@ class BuildExtensionFromCFFI(_build_ext):
 
 class develop(_develop):
     def run(self):
-        if not self.distribution.uses_system_lib():
+        if not has_system_lib():
             raise DistutilsError(
                 "This library is not usable in 'develop' mode when using the "
                 'bundled libsecp256k1. See README for details.'
@@ -409,27 +408,7 @@ class Distribution(_Distribution):
     _uses_system_lib = None
 
     def has_c_libraries(self):
-        return not self.uses_system_lib()
-
-    @classmethod
-    def uses_system_lib(cls):
-        if cls._uses_system_lib is None:
-            from setup_support import has_installed_libsecp256k1
-            cls._uses_system_lib = has_installed_libsecp256k1()
-        logging.info(f'\n   SYSTEM LIB: {cls._uses_system_lib} <- Should not be None\n')
-        return cls._uses_system_lib
-
-    @staticmethod
-    def build_flags(library, type_, path):
-        """Return separated build flags from pkg-config output"""
-        from setup_support import update_pkg_config_path
-
-        update_pkg_config_path(path)
-        options = {'I': '--cflags-only-I', 'L': '--libs-only-L', 'l': '--libs-only-l'}
-        # flags = subprocess.check_output(['pkg-config', options[type_], '--dont-define-prefix', library])  # S603
-        flags = call_pkg_config([options[type_]], library)
-        flags = list(flags.split())
-        return [flag.strip(f'-{type_}') for flag in flags]
+        return not has_system_lib()
 
 
 def main():
@@ -445,7 +424,7 @@ def main():
     setup_kwargs = dict(
         ext_modules=[extension],
         cmdclass={
-            'build_clib': None if Distribution.uses_system_lib() else BuildClibWithCMake,
+            'build_clib': None if has_system_lib() else BuildClibWithCMake,
             'build_ext': BuildExtensionFromCFFI,
             'develop': develop,
             'dist_info': dist_info,

@@ -42,8 +42,6 @@ def _find_lib():
     if 'COINCURVE_IGNORE_SYSTEM_LIB' in os.environ:
         return False
 
-    from cffi import FFI
-
     from setup import LIB_NAME
 
     update_pkg_config_path()
@@ -54,6 +52,7 @@ def _find_lib():
         if 'LIB_DIR' in os.environ:
             for path in glob.glob(os.path.join(os.environ['LIB_DIR'], f'*{LIB_NAME[3:]}*')):
                 with suppress(OSError):
+                    from cffi import FFI
                     FFI().dlopen(path)
                     return True
         # We couldn't locate libsecp256k1, so we'll use the bundled one
@@ -107,31 +106,6 @@ def call_pkg_config(options, library, *, debug=False):
     cmd = [pkg_config, *options, library]
 
     return subprocess_run(cmd, debug=debug)
-
-
-def has_installed_libsecp256k1():
-    """Checks if libsecp256k1 is installed on the system."""
-    if os.getenv('COINCURVE_IGNORE_SYSTEM_LIB', '1') == '1':
-        return False
-
-    from cffi import FFI
-
-    from setup import LIB_NAME
-
-    update_pkg_config_path()
-
-    try:
-        lib_dir = call_pkg_config(['--libs-only-L'], LIB_NAME)
-    except (OSError, subprocess.CalledProcessError):
-        if 'LIB_DIR' in os.environ:
-            for path in glob.glob(os.path.join(os.environ['LIB_DIR'], f'*{LIB_NAME[3:]}*')):
-                with suppress(OSError):
-                    FFI().dlopen(path)
-                    return True
-        # We couldn't locate libsecp256k1, so we'll use the bundled one
-        return False
-
-    return verify_system_lib(lib_dir[2:].strip())
 
 
 def verify_system_lib(lib_dir):
