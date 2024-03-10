@@ -32,6 +32,7 @@ def _find_lib():
     update_pkg_config_path()
 
     try:
+        logging.warning(f'env: {os.getenv("PKG_CONFIG_PATH")}')
         lib_dir = call_pkg_config(['--libs-only-L'], LIB_NAME)
         logging.warning(f'lib_dir: {lib_dir}')
     except (OSError, subprocess.CalledProcessError):
@@ -117,6 +118,7 @@ def define_secp256k1_local_lib_info():
 def update_pkg_config_path(path='.'):
     """Updates the PKG_CONFIG_PATH environment variable to include the given path."""
     pkg_config_paths = [path, os.getenv('PKG_CONFIG_PATH', '').strip('"')]
+    logging.warning(f'env: {os.getenv("PKG_CONFIG_PATH")}')
 
     if cpf := os.getenv('CONDA_PREFIX'):
         conda_paths = [os.path.join(cpf, sbd, 'pkgconfig') for sbd in ('lib', 'lib64', os.path.join('Library', 'lib'))]
@@ -125,6 +127,7 @@ def update_pkg_config_path(path='.'):
     if lbd := os.getenv('LIB_DIR'):
         pkg_config_paths.append(os.path.join(lbd, 'pkgconfig'))
 
+    logging.warning(f'env: {pkg_config_paths}')
     # Update environment
     os.environ['PKG_CONFIG_PATH'] = os.pathsep.join(pkg_config_paths)
 
