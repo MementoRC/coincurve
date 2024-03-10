@@ -151,7 +151,7 @@ def verify_system_lib(lib_dir):
     lib_ext = '.dll' if SYSTEM == 'Windows' else '.[sd][oy]*'
     logging.warning(f'dir: {lib_dir}')
     logging.warning(f'patt: *{LIB_NAME[3:]}{lib_ext}')
-    l_dyn = list(lib_dir.glob(f'*{LIB_NAME[3:]}{lib_ext}'))
+    l_dyn = list(lib_dir.glob(f'*{LIB_NAME[3:]}*{lib_ext}'))
 
     # Evaluates the dynamic libraries found,
     logging.warning(f'Found libraries: {l_dyn}')
