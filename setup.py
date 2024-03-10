@@ -516,11 +516,31 @@ package_data = {'coincurve': ['py.typed']}
 
 
 class BuildCFFIForSharedLib(_build_ext):
-    def build_extensions(self):
+    def build_extension(self, ext):
         build_script = os.path.join('_cffi_build', 'build_shared.py')
         c_file = self.extensions[0].sources[0]
         subprocess.run([sys.executable, build_script, c_file, '0'], shell=False, check=True)  # noqa S603
-        super().build_extensions()
+
+        # Location of locally built library
+        lib, inst_dir = define_secp256k1_local_lib_info()
+        prefix = os.path.join(self.build_lib.replace('lib', inst_dir), lib)
+        postfix = os.path.join('pkgconfig', f'{LIB_NAME}.pc')
+
+        c_lib_pkg = None
+        if not any([
+            os.path.isfile(c_lib_pkg := os.path.join(prefix, 'lib', postfix)),
+            os.path.isfile(c_lib_pkg := os.path.join(prefix, 'lib64', postfix)),
+            has_system_lib()
+        ]):
+            raise RuntimeError(
+                f'Library not found: {os.path.join(prefix, "lib/lib64", postfix)}'
+                f'\nSystem lib is {has_system_lib() = }. '
+                'Please check that the library was properly built.'
+            )
+
+        ext.extra_compile_args.extend([f'-I{build_flags(LIB_NAME, "I", c_lib_pkg)[0]}'])
+
+        super().build_extension(ext)
 
 
 if has_system_lib():
