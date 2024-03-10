@@ -33,6 +33,7 @@ def _find_lib():
 
     try:
         lib_dir = call_pkg_config(['--libs-only-L'], LIB_NAME)
+        logging.warning(f'lib_dir: {lib_dir}')
     except (OSError, subprocess.CalledProcessError):
         if 'LIB_DIR' in os.environ:
             for path in glob.glob(os.path.join(os.environ['LIB_DIR'], f'*{LIB_NAME[3:]}*')):
