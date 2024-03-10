@@ -137,26 +137,23 @@ def has_installed_libsecp256k1():
 def verify_system_lib(lib_dir):
     """Verifies that the system library is installed and of the expected type."""
     import ctypes
-    import fnmatch
+    from pathlib import Path
 
-    from setup import LIB_NAME, SECP256K1_BUILD, SYSTEM
+    from setup import LIB_NAME, PKG_NAME, SECP256K1_BUILD, SYSTEM
 
-    def load_library(d, lib):
+    def load_library(lib):
         try:
-            return ctypes.CDLL(str(os.path.join(d, lib)))
+            return ctypes.CDLL(lib)
         except OSError:
             return None
 
-    if SYSTEM == 'Windows':
-        lib_dir. lib_ext = f'{lib_dir[:-3]}bin', '.dll'
-    else:
-        lib_dir. lib_ext = lib_dir, '.[sd][oy]*'
-
-    filtered_dyn = fnmatch.filter(os.listdir(lib_dir), f'{LIB_NAME}{lib_ext}')
+    lib_dir = Path(lib_dir).with_name('bin') if SYSTEM == 'Windows' else Path(lib_dir)
+    lib_ext = '.dll' if SYSTEM == 'Windows' else '.[sd][oy]*'
+    l_dyn = list(lib_dir.glob(f'*{LIB_NAME[3:]}{lib_ext}'))
 
     # Evaluates the dynamic libraries found,
-    logging.warning(f'Found libraries: {filtered_dyn}')
-    dyn_lib = next((lib for lib in filtered_dyn if load_library(lib_dir, lib) is not None), False)
+    logging.warning(f'Found libraries: {l_dyn}')
+    dyn_lib = next((lib for lib in l_dyn if load_library(lib) is not None), False)
 
     found = any((dyn_lib and SECP256K1_BUILD == 'SHARED', not dyn_lib and SECP256K1_BUILD != 'SHARED'))
     if not found:
@@ -166,10 +163,9 @@ def verify_system_lib(lib_dir):
         )
 
     if dyn_lib:
-        lib_base = dyn_lib.split('.')[0]
+        lib_base = dyn_lib.stem
         # Update coincurve._secp256k1_library_info
-        with open(absolute('coincurve', '_secp256k1_library_info.py'), 'w') as f:
-            f.write(f"SECP256K1_LIBRARY_NAME = '{lib_base}'\n")
-            f.write("SECP256K1_LIBRARY_TYPE = 'EXTERNAL'\n")
+        info_file = Path(PKG_NAME, '_secp256k1_library_info.py')
+        info_file.write_text(f"SECP256K1_LIBRARY_NAME = '{lib_base}'\nSECP256K1_LIBRARY_TYPE = 'EXTERNAL'\n")
 
     return found
