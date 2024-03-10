@@ -10,21 +10,6 @@ def absolute(*paths):
     return op.realpath(op.abspath(op.join(op.dirname(__file__), *paths)))
 
 
-def update_pkg_config_path(path='.'):
-    """Updates the PKG_CONFIG_PATH environment variable to include the given path."""
-    pkg_config_paths = [path, os.getenv('PKG_CONFIG_PATH', '').strip('"')]
-
-    if cpf := os.getenv('CONDA_PREFIX'):
-        conda_paths = [os.path.join(cpf, sbd, 'pkgconfig') for sbd in ('lib', 'lib64', os.path.join('Library', 'lib'))]
-        pkg_config_paths.extend([p for p in conda_paths if os.path.isdir(p)])
-
-    if lbd := os.getenv('LIB_DIR'):
-        pkg_config_paths.append(os.path.join(lbd, 'pkgconfig'))
-
-    # Update environment
-    os.environ['PKG_CONFIG_PATH'] = os.pathsep.join(pkg_config_paths)
-
-
 def build_flags(library, type_, path):
     """Return separated build flags from pkg-config output"""
 
@@ -106,6 +91,21 @@ def call_pkg_config(options, library, *, debug=False):
     cmd = [pkg_config, *options, library]
 
     return subprocess_run(cmd, debug=debug)
+
+
+def update_pkg_config_path(path='.'):
+    """Updates the PKG_CONFIG_PATH environment variable to include the given path."""
+    pkg_config_paths = [path, os.getenv('PKG_CONFIG_PATH', '').strip('"')]
+
+    if cpf := os.getenv('CONDA_PREFIX'):
+        conda_paths = [os.path.join(cpf, sbd, 'pkgconfig') for sbd in ('lib', 'lib64', os.path.join('Library', 'lib'))]
+        pkg_config_paths.extend([p for p in conda_paths if os.path.isdir(p)])
+
+    if lbd := os.getenv('LIB_DIR'):
+        pkg_config_paths.append(os.path.join(lbd, 'pkgconfig'))
+
+    # Update environment
+    os.environ['PKG_CONFIG_PATH'] = os.pathsep.join(pkg_config_paths)
 
 
 def verify_system_lib(lib_dir):
