@@ -340,7 +340,7 @@ class BuildExtensionFromCFFI(_build_ext):
             cmd = [sys.executable, build_script, c_file, '1' if self.static_lib else '0']
             subprocess_run(cmd)
 
-    def build_extension(self, ext, build_flags):
+    def build_extension(self, ext):
         # Construct C-file from CFFI
         self.create_c_files(ext)
 
@@ -366,7 +366,6 @@ class BuildExtensionFromCFFI(_build_ext):
 
         # PKG_CONFIG_PATH is updated by build_clib if built locally,
         # however, it would not work for a step-by-step build, thus we specify the lib path
-        build_flags = self.distribution.build_flags
         ext.extra_compile_args.extend([f'-I{build_flags(LIB_NAME, "I", c_lib_pkg)[0]}'])
         ext.library_dirs.extend(build_flags(LIB_NAME, 'L', c_lib_pkg))
 
