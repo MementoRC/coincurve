@@ -24,7 +24,7 @@ def build_flags(library, type_, path):
 
 
 def _find_lib():
-    if 'COINCURVE_IGNORE_SYSTEM_LIB' in os.environ:
+    if os.getenv('COINCURVE_IGNORE_SYSTEM_LIB', '1') == '1':
         return False
 
     from setup import LIB_NAME
@@ -53,6 +53,7 @@ _has_system_lib = None
 
 def has_system_lib():
     global _has_system_lib
+    logging.warning(f'lib_dir: {_has_system_lib}')
     if _has_system_lib is None:
         _has_system_lib = _find_lib()
     return _has_system_lib
