@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+# -*- mode: jinja-shell -*-
+
 function startgroup {
     # Start a foldable group of log lines
     # Pass a single argument, quoted
