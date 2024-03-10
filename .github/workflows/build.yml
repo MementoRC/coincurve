@@ -313,7 +313,7 @@ jobs:
             COINCURVE_SECP256K1_BUILD='SHARED'
         CIBW_BUILD: "cp312-macosx_x86_64"
         CIBW_ARCHS_MACOS: x86_64
-        CIBW_BEFORE_ALL: >
+        CIBW_BEFORE_ALL_MACOS: >
             conda install -c conda-forge pkg-config libsecp256k1
         CIBW_BUILD_VERBOSITY: 1
         # pytest needs to be defined here to find 'coincurve' package?
