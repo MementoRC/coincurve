@@ -315,6 +315,7 @@ jobs:
             COINCURVE_IGNORE_SYSTEM_LIB="0"
             COINCURVE_UPSTREAM_REF="__no_tag__"
             COINCURVE_SECP256K1_BUILD='SHARED'
+            PKG_CONFIG_PATH=$CONDA_PREFIX/lib/pkgconfig
         CIBW_BUILD_VERBOSITY: 1
         # pytest needs to be defined here to find 'coincurve' package?
         CIBW_TEST_REQUIRES: pytest pytest-benchmark
@@ -326,7 +327,7 @@ jobs:
             b=PrivateKey();
             assert a.ecdh(b.public_key.format())==b.ecdh(a.public_key.format())
             "
-      run: python -m cibuildwheel --output-dir wheelhouse
+      run: PKG_CONFIG_PATH=$CONDA_PREFIX/lib/pkgconfig python -m cibuildwheel --output-dir wheelhouse
 
     # - name: Build wheels
     #   uses: pypa/cibuildwheel@v2.16.5
