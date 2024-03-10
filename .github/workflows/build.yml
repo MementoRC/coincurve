@@ -295,9 +295,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Miniconda
-      uses: conda-incubator/setup-miniconda@v3
-
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       uses: actions/setup-python@v5
       with:
@@ -313,7 +310,7 @@ jobs:
         CIBW_BUILD: "cp312-macosx_x86_64"
         CIBW_ARCHS_MACOS: x86_64
         # CIBW_BEFORE_BUILD_MACOS: ./.github/scripts/build-with-conda-osx.shconda-forge libsecp256k1 pkg-config
-        CIBW_BEFORE_BUILD_MACOS: conda install -c conda-forge libsecp256k1 pkg-config
+        CIBW_BEFORE_BUILD_MACOS: conda install -c conda-forge libsecp256k1 pkg-config && export CONDA_PREFIX
         CIBW_BUILD_VERBOSITY: 1
         # pytest needs to be defined here to find 'coincurve' package?
         CIBW_TEST_REQUIRES: pytest pytest-benchmark
