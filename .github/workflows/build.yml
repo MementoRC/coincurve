@@ -312,7 +312,7 @@ jobs:
 
     - name: Install cibuildwheel and twine
       run: |
-        conda install -c conda-forge libsecp256k1
+        conda install -c conda-forge libsecp256k1 twine
         pip install cibuildwheel
 
     - name: Build wheels
