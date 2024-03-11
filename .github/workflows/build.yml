@@ -291,6 +291,9 @@ jobs:
     needs:
     - test
     runs-on: macos-latest
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
     - uses: actions/checkout@v4
@@ -302,6 +305,10 @@ jobs:
 
     - name: Install Miniconda
       uses: conda-incubator/setup-miniconda@v3
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        auto-activate-base: false
+        use-only-tar-bz2: true
 
     - name: Install cibuildwheel and twine
       run: |
