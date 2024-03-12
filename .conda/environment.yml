@@ -1,0 +1,15 @@
+name: coincurve-conda
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python
+  - libsecp256k1
+  - pkg-config
+  - cmake
+  - cffi >=1.3.0
+  - setuptools >=61
+  - pytest
+  - pytest-benchmark
+  - twine
+  - pip

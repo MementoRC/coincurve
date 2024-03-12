@@ -309,11 +309,10 @@ jobs:
         python-version: ${{ env.PYTHON_VERSION }}
         auto-activate-base: false
         use-only-tar-bz2: true
+        environment-file: .conda/environment.yml
 
     - name: Install cibuildwheel and twine
       run: |
-        conda activate test
-        conda install -c conda-forge libsecp256k1 twine
         pip install cibuildwheel
 
     - name: Build wheels
