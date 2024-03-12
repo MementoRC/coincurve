@@ -144,7 +144,9 @@ def verify_system_lib(lib_dir):
     def load_library(lib):
         try:
             return ctypes.CDLL(lib)
-        except OSError:
+        except OSError as e:
+            logging.error(f'Failed to load library: {lib}')
+            logging.exception(f'   {e}')
             return None
 
     logging.warning(f'find_library: {find_library(LIB_NAME[3:])}')

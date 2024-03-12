@@ -359,7 +359,7 @@ jobs:
 
 
   macoss-wheels-conda-arm64:
-    name: Build macOS (CONDA) wheels AMD64
+    name: Build macOS (CONDA) wheels ARM
     needs:
     - test
     runs-on: macos-14
