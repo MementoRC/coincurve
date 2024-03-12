@@ -271,7 +271,7 @@ class SharedLinker(object):
         if compiler.__class__.__name__ == 'UnixCCompiler':
             extra_link_args.extend([f'-l{lib}' for lib in libraries])
             if has_system_lib():
-                extra_link_args.extend([f'-L{lib}' for lib in libraries_dirs])
+                extra_link_args.extend([f'-Wl,@rpath,{lib}' for lib in libraries_dirs])
             elif sys.platform == 'darwin':
                 extra_link_args.extend(['-Wl,-rpath,@loader_path/lib'])
             else:
