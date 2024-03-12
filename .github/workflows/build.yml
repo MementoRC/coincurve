@@ -394,6 +394,7 @@ jobs:
             COINCURVE_SECP256K1_BUILD='SHARED'
             PKG_CONFIG_PATH=$CONDA_PREFIX/lib/pkgconfig
             DYLD_LIBRARY_PATH=$CONDA_PREFIX/lib
+        CIBW_ARCHS_MACOS: arm64
         CIBW_BUILD_VERBOSITY: 1
         # pytest needs to be defined here to find 'coincurve' package?
         CIBW_TEST_REQUIRES: pytest pytest-benchmark
