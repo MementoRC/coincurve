@@ -308,7 +308,6 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         auto-activate-base: false
-        use-only-tar-bz2: true
         environment-file: .conda/environment.yml
 
     - name: Install cibuildwheel and twine
