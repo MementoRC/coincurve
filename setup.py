@@ -93,14 +93,11 @@ def main():
         )
 
         extension.extra_compile_args = [
-            subprocess.check_output(['pkg-config', '--cflags-only-I', 'libsecp256k1']).strip().decode('utf-8')
-            # S603
+            subprocess.run(['pkg-config', '--cflags-only-I', 'libsecp256k1']).strip().decode('utf-8')  # noqa S603
         ]
         extension.extra_link_args = [
-            subprocess.check_output(['pkg-config', '--libs-only-L', 'libsecp256k1']).strip().decode('utf-8'),
-            # S603
-            subprocess.check_output(['pkg-config', '--libs-only-l', 'libsecp256k1']).strip().decode('utf-8'),
-            # S603
+            subprocess.run(['pkg-config', '--libs-only-L', 'libsecp256k1']).strip().decode('utf-8'),  # noqa S603
+            subprocess.run(['pkg-config', '--libs-only-l', 'libsecp256k1']).strip().decode('utf-8'),  # noqa S603
         ]
 
         if os.name == 'nt' or sys.platform == 'win32':
