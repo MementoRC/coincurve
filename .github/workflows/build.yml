@@ -229,6 +229,9 @@ jobs:
     needs:
     - test
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
     - uses: actions/checkout@v4
@@ -240,14 +243,19 @@ jobs:
 
     - name: Install Miniconda
       uses: conda-incubator/setup-miniconda@v3
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        auto-activate-base: false
+        environment-file: .conda/environment.yml
 
     - name: Build wheels
-      uses: pypa/cibuildwheel@v2.16.5
+      # uses: pypa/cibuildwheel@v2.16.5
       env:
         CIBW_ENVIRONMENT:
             COINCURVE_IGNORE_SYSTEM_LIB="0"
             COINCURVE_UPSTREAM_REF="__no_tag__"
             COINCURVE_SECP256K1_BUILD='SHARED'
+            DYLD_LIBRARY_PATH=$CONDA_PREFIX/lib
         CIBW_BUILD: "cp312-win_amd64"
         CIBW_ARCHS_WINDOWS: "AMD64"
         CIBW_BEFORE_ALL: >
@@ -264,6 +272,7 @@ jobs:
             assert a.ecdh(b.public_key.format())==b.ecdh(a.public_key.format())
             " &&
             pytest {project}
+      run: python -m cibuildwheel --output-dir wheelhouse
         # dir %CONDA_PREFIX%\Library\bin &&
         # set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
         # set PKG_CONFIG_PATH=%PATH%;%CONDA_PREFIX%\Library\lib\pkgconfig &&
@@ -310,7 +319,7 @@ jobs:
         auto-activate-base: false
         environment-file: .conda/environment.yml
 
-    - name: Install cibuildwheel and twine
+    - name: Install cibuildwheel
       run: |
         pip install cibuildwheel
 
@@ -396,7 +405,6 @@ jobs:
             PKG_CONFIG_PATH=$CONDA_PREFIX/lib/pkgconfig
             DYLD_LIBRARY_PATH=$CONDA_PREFIX/lib
         CIBW_ARCHS_MACOS: native
-        CIBW_BEFORE_ALL_MACOS: ''
         CIBW_BUILD_VERBOSITY: 1
         # pytest needs to be defined here to find 'coincurve' package?
         CIBW_TEST_REQUIRES: pytest pytest-benchmark
