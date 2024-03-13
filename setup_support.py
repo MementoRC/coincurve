@@ -32,7 +32,9 @@ def _find_lib():
     update_pkg_config_path()
 
     try:
-        logging.warning(f'env: {os.getenv("PKG_CONFIG_PATH")}')
+        logging.warning(f'PKG_CONFIG_PATH: {os.getenv("PKG_CONFIG_PATH")}')
+        logging.warning(f'DYLD_LIBRARY_PATH: {os.getenv("DYLD_LIBRARY_PATH")}')
+        logging.warning(f'LD_LIBRARY_PATH: {os.getenv("LD_LIBRARY_PATH")}')
         lib_dir = call_pkg_config(['--libs-only-L'], LIB_NAME)
         logging.warning(f'lib_dir: {lib_dir}')
     except (OSError, subprocess.CalledProcessError):
