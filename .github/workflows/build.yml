@@ -249,7 +249,7 @@ jobs:
         environment-file: .conda/environment.yml
 
     - name: Build wheels
-      # uses: pypa/cibuildwheel@v2.16.5
+      uses: pypa/cibuildwheel@v2.16.5
       env:
         CIBW_ENVIRONMENT:
             COINCURVE_IGNORE_SYSTEM_LIB="0"
@@ -272,7 +272,6 @@ jobs:
             assert a.ecdh(b.public_key.format())==b.ecdh(a.public_key.format())
             " &&
             pytest {project}
-      run: python -m cibuildwheel --output-dir wheelhouse
         # dir %CONDA_PREFIX%\Library\bin &&
         # set PATH=%PATH%;%CONDA_PREFIX%\Library\bin &&
         # set PKG_CONFIG_PATH=%PATH%;%CONDA_PREFIX%\Library\lib\pkgconfig &&
@@ -396,7 +395,6 @@ jobs:
         pip install cibuildwheel
 
     - name: Build wheels
-      uses: pypa/cibuildwheel@v2.17.0
       env:
         CIBW_ENVIRONMENT:
             COINCURVE_IGNORE_SYSTEM_LIB="0"
@@ -416,7 +414,7 @@ jobs:
             b=PrivateKey();
             assert a.ecdh(b.public_key.format())==b.ecdh(a.public_key.format())
             "
-      # run: python -m cibuildwheel --output-dir wheelhouse
+      run: python -m cibuildwheel --output-dir wheelhouse
 
 
   windows-wheels-x86_64:
