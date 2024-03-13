@@ -17,7 +17,7 @@ class BuildClib(build_clib.build_clib):
             self.build_flags = {'include_dirs': [], 'library_dirs': [], 'define': []}
 
     def get_source_files(self):
-        from setup import absolute, has_system_lib
+        from support import absolute, has_system_lib
 
         # Ensure library has been downloaded (sdist might have been skipped)
         if not has_system_lib():
