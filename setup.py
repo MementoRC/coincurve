@@ -343,8 +343,8 @@ setup(
     install_requires=['asn1crypto', 'cffi>=1.3.0'],
 
     package_dir={'coincurve': 'src/coincurve'},
-    packages=find_packages(exclude=('_cffi_build', '_cffi_build.*', 'libsecp256k1', 'tests')),
-    package_data=package_data,
+    # packages=find_packages(exclude=('_cffi_build', '_cffi_build.*', 'libsecp256k1', 'tests')),
+    # package_data=package_data,
 
     distclass=Distribution,
     zip_safe=False,
