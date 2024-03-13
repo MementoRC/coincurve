@@ -7,6 +7,8 @@ import subprocess
 import tarfile
 from io import BytesIO
 import sys
+from sys import path as PATH
+from os.path import join
 
 from setuptools import Distribution as _Distribution, setup, find_packages, __version__ as setuptools_version
 from setuptools._distutils import log
@@ -19,13 +21,20 @@ from setuptools.command.dist_info import dist_info as _dist_info
 from setuptools.command.egg_info import egg_info as _egg_info
 from setuptools.command.sdist import sdist as _sdist
 
+# Define the package root directory and add it to the system path
+COINCURVE_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+PATH.append(COINCURVE_ROOT_DIR)
+
+# Add setuptools local package path
+PATH.insert(0, join(COINCURVE_ROOT_DIR, 'setuptools'))
+
 try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 except ImportError:
     _bdist_wheel = None
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-from setup_support import absolute, build_flags, detect_dll, has_system_lib
+from setuptools.support import absolute, build_flags, detect_dll, has_system_lib
 
 BUILDING_FOR_WINDOWS = detect_dll()
 
