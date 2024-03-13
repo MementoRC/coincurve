@@ -341,7 +341,7 @@ jobs:
             b=PrivateKey();
             assert a.ecdh(b.public_key.format())==b.ecdh(a.public_key.format())
             "
-      run: python -m cibuildwheel --output-dir wheelhouse
+      run: YLD_LIBRARY_PATH=$CONDA_PREFIX/lib python -m cibuildwheel --output-dir wheelhouse
 
     # - name: Build wheels
     #   uses: pypa/cibuildwheel@v2.16.5
@@ -414,7 +414,7 @@ jobs:
             b=PrivateKey();
             assert a.ecdh(b.public_key.format())==b.ecdh(a.public_key.format())
             "
-      run: python -m cibuildwheel --output-dir wheelhouse
+      run: DYLD_LIBRARY_PATH=$CONDA_PREFIX/lib python -m cibuildwheel --output-dir wheelhouse
 
 
   windows-wheels-x86_64:
