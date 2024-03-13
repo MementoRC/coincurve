@@ -68,7 +68,7 @@ if _bdist_wheel:
             from setup_tools.support import has_system_lib
 
             if not has_system_lib():
-                from setup import download_library
+                from setup_tools.support import download_library
 
                 download_library(self)
             super().run()

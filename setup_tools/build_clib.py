@@ -21,7 +21,7 @@ class BuildClib(build_clib.build_clib):
 
         # Ensure library has been downloaded (sdist might have been skipped)
         if not has_system_lib():
-            from setup import download_library
+            from setup_tools.support import download_library
 
             download_library(self)
 

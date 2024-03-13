@@ -1,10 +1,7 @@
 import os
 import os.path
 import platform
-import shutil
 import subprocess
-import tarfile
-from io import BytesIO
 import sys
 from sys import path as PATH
 from os.path import join
@@ -20,7 +17,7 @@ PATH.append(COINCURVE_ROOT_DIR)
 PATH.insert(0, join(COINCURVE_ROOT_DIR, 'setup_tools'))
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-from setup_tools.support import absolute, detect_dll, has_system_lib  # noqa: E402
+from setup_tools.support import detect_dll, has_system_lib  # noqa: E402
 
 BUILDING_FOR_WINDOWS = detect_dll(COINCURVE_ROOT_DIR)
 
@@ -39,38 +36,6 @@ if [int(i) for i in setuptools_version.split('.', 2)[:2]] < [3, 3]:
         f'Your setuptools version ({setuptools_version}) is too old to correctly install this package. Please upgrade '
         f'to a newer version (>= 3.3).'
     )
-
-
-def download_library(command):
-    if command.dry_run:
-        return
-    libdir = absolute('libsecp256k1')
-    if os.path.exists(os.path.join(libdir, 'autogen.sh')):
-        # Library already downloaded
-        return
-    if not os.path.exists(libdir):
-        import logging
-
-        command.announce('downloading libsecp256k1 source code', level=logging.INFO)
-        try:
-            import requests
-            try:
-                r = requests.get(LIB_TARBALL_URL, stream=True, timeout=10)
-                status_code = r.status_code
-                if status_code == 200:
-                    content = BytesIO(r.raw.read())
-                    content.seek(0)
-                    with tarfile.open(fileobj=content) as tf:
-                        dirname = tf.getnames()[0].partition('/')[0]
-                        tf.extractall()  # noqa: S202
-                    shutil.move(dirname, libdir)
-                else:
-                    raise SystemExit('Unable to download secp256k1 library: HTTP-Status: %d', status_code)
-            except requests.exceptions.RequestException as e:
-                raise SystemExit('Unable to download secp256k1 library: %s', str(e))
-        except ImportError as e:
-            raise SystemExit('Unable to download secp256k1 library: %s', str(e))
-
 
 package_data = {'coincurve': ['py.typed']}
 
@@ -93,11 +58,11 @@ def main():
         )
 
         extension.extra_compile_args = [
-            subprocess.run(['pkg-config', '--cflags-only-I', 'libsecp256k1']).strip().decode('utf-8')  # noqa S603
+            subprocess.check_output(['pkg-config', '--cflags-only-I', 'libsecp256k1']).strip().decode()  # noqa S603
         ]
         extension.extra_link_args = [
-            subprocess.run(['pkg-config', '--libs-only-L', 'libsecp256k1']).strip().decode('utf-8'),  # noqa S603
-            subprocess.run(['pkg-config', '--libs-only-l', 'libsecp256k1']).strip().decode('utf-8'),  # noqa S603
+            subprocess.check_output(['pkg-config', '--libs-only-L', 'libsecp256k1']).strip().decode(),  # noqa S603
+            subprocess.check_output(['pkg-config', '--libs-only-l', 'libsecp256k1']).strip().decode(),  # noqa S603
         ]
 
         if os.name == 'nt' or sys.platform == 'win32':
