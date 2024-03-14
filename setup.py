@@ -9,7 +9,7 @@ import sys
 import tarfile
 from io import BytesIO
 
-from setuptools import Distribution as _Distribution, setup, find_packages, __version__ as setuptools_version
+from setuptools import Distribution as _Distribution, setup, __version__ as setuptools_version
 from setuptools._distutils import log
 from setuptools._distutils.errors import DistutilsError
 from setuptools.command.build_clib import build_clib as _build_clib
