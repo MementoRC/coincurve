@@ -397,6 +397,7 @@ jobs:
 
     - name: Install cibuildwheel and twine
       run: |
+        pip cache purge
         pip install cibuildwheel
 
     - name: Build wheels
