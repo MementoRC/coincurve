@@ -392,8 +392,6 @@ class Distribution(_Distribution):
 
 
 def main():
-    package_data = {'coincurve': ['py.typed']}
-
     extension = Extension(
         name='coincurve._libsecp256k1',
         sources=['_c_file_for_extension.c'],
