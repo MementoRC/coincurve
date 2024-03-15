@@ -92,9 +92,9 @@ def download_library(command):
     if command.dry_run:
         return
 
-    from setup import LIB_TARBALL_URL
+    from setup import LIB_TARBALL_URL, COINCURVE_ROOT_DIR
 
-    libdir = absolute('libsecp256k1')
+    libdir = absolute(COINCURVE_ROOT_DIR, 'libsecp256k1')
     if os.path.exists(os.path.join(libdir, 'autogen.sh')):
         # Library already downloaded
         return
