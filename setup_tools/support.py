@@ -9,8 +9,10 @@ from io import BytesIO
 
 
 def absolute(*paths):
+    from setup import COINCURVE_ROOT_DIR
+
     op = os.path
-    return op.realpath(op.abspath(op.join(op.dirname(__file__), *paths)))
+    return op.realpath(op.abspath(op.join(COINCURVE_ROOT_DIR, *paths)))
 
 
 def build_flags(library, type_, path):
@@ -92,7 +94,7 @@ def download_library(command):
     if command.dry_run:
         return
 
-    from setup import COINCURVE_ROOT_DIR, LIB_TARBALL_URL
+    from setup import COINCURVE_ROOT_DIR
 
     libdir = absolute(COINCURVE_ROOT_DIR, 'libsecp256k1')
     if os.path.exists(os.path.join(libdir, 'autogen.sh')):
@@ -106,6 +108,8 @@ def download_library(command):
             import requests
 
             try:
+                from setup import LIB_TARBALL_URL
+
                 r = requests.get(LIB_TARBALL_URL, stream=True, timeout=10)
                 status_code = r.status_code
                 if status_code == 200:
