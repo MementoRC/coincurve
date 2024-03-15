@@ -53,7 +53,7 @@ def main():
 
         extension = Extension(
             name='coincurve._libsecp256k1',
-            sources=[os.path.join('coincurve', '_libsecp256k1.c')],
+            sources=[os.path.join('src/coincurve', '_libsecp256k1.c')],
             # ABI?: py_limited_api=True,
         )
 
@@ -129,14 +129,8 @@ def main():
         setup_requires=['cffi>=1.3.0'],
         install_requires=['asn1crypto', 'cffi>=1.3.0'],
 
-        packages=find_packages(
-            exclude=[
-                'setup_tools',
-                'tests',
-            ]
-        ),
-        package_dir={'coincurve': 'coincurve'},
-        package_data=package_data,
+        packages=['coincurve'],
+        package_dir={'coincurve': 'src/coincurve'},
 
         distclass=Distribution,
         zip_safe=False,

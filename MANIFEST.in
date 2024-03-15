@@ -1,4 +1,4 @@
-include coincurve/py.typed
+include src/coincurve/py.typed
 recursive-include setup_tools *.py
 recursive-include _cffi_build *.py *.h
 prune /*
