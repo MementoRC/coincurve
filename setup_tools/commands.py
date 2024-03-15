@@ -65,7 +65,10 @@ if _bdist_wheel:
 
     class BdistWheel(_bdist_wheel):
         def run(self):
+            import logging
             from setup_tools.support import has_system_lib
+
+            logging.info(vars(self))
 
             if not has_system_lib():
                 from setup_tools.support import download_library
