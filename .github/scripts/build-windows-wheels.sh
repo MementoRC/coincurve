@@ -31,7 +31,7 @@ mv .libs/libsecp256k1-?.dll ../clean/src/coincurve/libsecp256k1.dll
 cd ../clean
 python setup.py bdist_wheel --plat-name=win_amd64 -vvv
 rm src/coincurve/libsecp256k1.dll
-rm -f build/temp.*
+rm -rf build/temp.*
 
 cd ../32bit
 build_dll i686-w64-mingw32
