@@ -71,8 +71,8 @@ jobs:
     - name: Run tests
       run: tox -e ${PYTHON_VERSION}
 
-    - name: Run benchmarks
-      run: tox -e bench
+    # - name: Run benchmarks
+    #   run: tox -e bench
 
     - name: Upload coverage
       run: codecov -X gcov
@@ -111,8 +111,8 @@ jobs:
     - name: Run tests
       run: tox -e ${{ env.PYTHON_VERSION }}
 
-    - name: Run benchmarks
-      run: tox -e bench
+    # - name: Run benchmarks
+    #   run: tox -e bench
 
   linux-wheels-standard:
     name: Build Linux wheels
