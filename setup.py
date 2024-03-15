@@ -3,10 +3,10 @@ import os.path
 import platform
 import subprocess
 import sys
-from sys import path as PATH
 from os.path import join
+from sys import path as PATH
 
-from setuptools import Distribution as _Distribution, setup, find_packages, __version__ as setuptools_version
+from setuptools import Distribution as _Distribution, setup, __version__ as setuptools_version
 from setuptools.extension import Extension
 
 # Define the package root directory and add it to the system path
