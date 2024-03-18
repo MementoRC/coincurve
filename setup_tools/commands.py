@@ -12,6 +12,8 @@ class EggInfo(egg_info.egg_info):
         from setup_tools.support import has_system_lib
 
         if not has_system_lib():
+            import logging
+            logging.info(f'Downloading libsecp256k1 source code {has_system_lib() = }')
             from support import download_library
 
             download_library(self)

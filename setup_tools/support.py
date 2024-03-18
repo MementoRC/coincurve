@@ -185,4 +185,5 @@ def verify_system_lib(lib_dir):
         info_file = Path(PKG_NAME, '_secp256k1_library_info.py')
         info_file.write_text(f"SECP256K1_LIBRARY_NAME = '{lib_base}'\nSECP256K1_LIBRARY_TYPE = 'EXTERNAL'\n")
 
+    logging.warning(f'returning: {found = }')
     return found
