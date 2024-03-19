@@ -146,14 +146,9 @@ def update_pkg_config_path(path='.'):
 def verify_system_lib(lib_dir):
     """Verifies that the system library is installed and of the expected type."""
     import ctypes
-    import platform
-    from ctypes.util import find_library
     from pathlib import Path
 
-    LIB_NAME = 'libsecp256k1'  # noqa N806
-    PKG_NAME = 'coincurve'  # noqa N806
-    SECP256K1_BUILD = os.getenv('COINCURVE_SECP256K1_BUILD') or 'STATIC'  # noqa N806
-    SYSTEM = platform.system()  # noqa N806
+    from setup import LIB_NAME, PKG_NAME, SECP256K1_BUILD, SYSTEM
 
     def load_library(lib):
         try:
