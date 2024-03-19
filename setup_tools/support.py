@@ -157,25 +157,20 @@ def verify_system_lib(lib_dir):
 
     def load_library(lib):
         try:
-            logging.warning(f'loading {lib}: {ctypes.CDLL(lib)}')
             return ctypes.CDLL(lib)
         except OSError as e:
             logging.warning(f'{e = }')
             return None
 
-    logging.warning(f'find_library: {find_library(LIB_NAME[3:])}')
     lib_dir = Path(lib_dir).with_name('bin') if SYSTEM == 'Windows' else Path(lib_dir)
     lib_ext = '.dll' if SYSTEM == 'Windows' else '.[sd][oy]*'
-    logging.warning(f'dir: {lib_dir}')
-    logging.warning(f'patt: *{LIB_NAME[3:]}{lib_ext}')
     l_dyn = list(lib_dir.glob(f'*{LIB_NAME[3:]}*{lib_ext}'))
 
     # Evaluates the dynamic libraries found,
-    logging.warning(f'Found libraries: {l_dyn}')
     dyn_lib = next((lib for lib in l_dyn if load_library(lib) is not None), False)
-    logging.warning(f'Dyn libraries: {dyn_lib}')
 
     found = any((dyn_lib and SECP256K1_BUILD == 'SHARED', not dyn_lib and SECP256K1_BUILD != 'SHARED'))
+    logging.warning(f'returning: {found = }')
     if not found:
         logging.warning(
             f'WARNING: {LIB_NAME} is installed, but it is not the expected type. '
