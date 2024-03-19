@@ -87,6 +87,7 @@ jobs:
 
     - name: Build sdist & wheel
       run: |
+        conda install python-build
         python -m build --outdir conda_dist
 
     - name: Test wheel in a clean environment
