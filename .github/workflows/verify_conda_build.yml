@@ -73,6 +73,9 @@ jobs:
     needs:
     - test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
 
     steps:
     - uses: actions/checkout@v4
@@ -87,7 +90,6 @@ jobs:
 
     - name: Build sdist & wheel
       run: |
-        conda activate coincurve-with-conda
         conda install python-build
         python -m build --outdir conda_dist
 
