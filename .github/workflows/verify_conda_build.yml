@@ -97,5 +97,5 @@ jobs:
       run: |
         conda install pip
         pip install conda_dist/*.whl
-        python -m pytest --pyargs coincurve
+        python -m pytest tests
         
