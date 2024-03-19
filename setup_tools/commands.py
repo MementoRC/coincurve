@@ -13,9 +13,10 @@ class EggInfo(egg_info.egg_info):
 
         if not has_system_lib():
             import logging
-            logging.info(f'Downloading libsecp256k1 source code {has_system_lib() = }')
+
             from support import download_library
 
+            logging.info(f'Downloading libsecp256k1 source code {has_system_lib() = }')
             download_library(self)
 
         super().run()
