@@ -87,6 +87,7 @@ jobs:
 
     - name: Build sdist & wheel
       run: |
+        conda activate coincurve-with-conda
         conda install python-build
         python -m build --outdir conda_dist
 
