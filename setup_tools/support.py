@@ -128,7 +128,7 @@ def define_secp256k1_local_lib_info():
     return LIB_NAME, 'x_lib'
 
 
-def update_pkg_config_path(path='.'):
+def update_pkg_config_path(path=None):
     """Updates the PKG_CONFIG_PATH environment variable to include the given path."""
     pkg_config_paths = [path, os.getenv('PKG_CONFIG_PATH', '').strip('"')]
 
@@ -140,7 +140,7 @@ def update_pkg_config_path(path='.'):
         pkg_config_paths.append(os.path.join(lbd, 'pkgconfig'))
 
     # Update environment
-    os.environ['PKG_CONFIG_PATH'] = os.pathsep.join(pkg_config_paths)
+    os.environ['PKG_CONFIG_PATH'] = os.pathsep.join([p for p in pkg_config_paths if p is not None])
 
 
 def verify_system_lib(lib_dir, inst_dir='src'):
@@ -172,7 +172,7 @@ def verify_system_lib(lib_dir, inst_dir='src'):
         )
 
     if dyn_lib and inst_dir is not None:
-        lib_base = dyn_lib.stem
+        lib_base = dyn_lib.name
         # Update coincurve._secp256k1_library_info
         info_file = Path(inst_dir, PKG_NAME, '_secp256k1_library_info.py')
         info_file.write_text(f"SECP256K1_LIBRARY_NAME = '{lib_base}'\nSECP256K1_LIBRARY_TYPE = 'EXTERNAL'\n")
