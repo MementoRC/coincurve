@@ -9,6 +9,6 @@ dependencies:
   - pkg-config
   - pytest
   - pytest-benchmark
-  - python
+  - python =3.12
   - setuptools >=61
   - tox-conda
