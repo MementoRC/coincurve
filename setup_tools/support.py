@@ -143,7 +143,7 @@ def update_pkg_config_path(path=None):
     os.environ['PKG_CONFIG_PATH'] = os.pathsep.join([p for p in pkg_config_paths if p is not None])
 
 
-def verify_system_lib(lib_dir, inst_dir=None):
+def verify_system_lib(lib_dir, inst_dir='src'):
     """Verifies that the system library is installed and of the expected type."""
     import ctypes
     from pathlib import Path
