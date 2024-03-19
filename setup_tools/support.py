@@ -143,7 +143,7 @@ def update_pkg_config_path(path=None):
     os.environ['PKG_CONFIG_PATH'] = os.pathsep.join([p for p in pkg_config_paths if p is not None])
 
 
-def verify_system_lib(lib_dir):
+def verify_system_lib(lib_dir, inst_dir=None):
     """Verifies that the system library is installed and of the expected type."""
     import ctypes
     from pathlib import Path
@@ -165,18 +165,16 @@ def verify_system_lib(lib_dir):
     dyn_lib = next((lib for lib in l_dyn if load_library(lib) is not None), False)
 
     found = any((dyn_lib and SECP256K1_BUILD == 'SHARED', not dyn_lib and SECP256K1_BUILD != 'SHARED'))
-    logging.warning(f'returning: {found = }')
     if not found:
         logging.warning(
             f'WARNING: {LIB_NAME} is installed, but it is not the expected type. '
             f'Please ensure that the {SECP256K1_BUILD} library is installed.'
         )
 
-    if dyn_lib:
+    if dyn_lib and inst_dir is not None:
         lib_base = dyn_lib.stem
         # Update coincurve._secp256k1_library_info
-        info_file = Path(PKG_NAME, '_secp256k1_library_info.py')
+        info_file = Path(inst_dir, PKG_NAME, '_secp256k1_library_info.py')
         info_file.write_text(f"SECP256K1_LIBRARY_NAME = '{lib_base}'\nSECP256K1_LIBRARY_TYPE = 'EXTERNAL'\n")
 
-    logging.warning(f'returning: {found = }')
     return found
