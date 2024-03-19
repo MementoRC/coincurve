@@ -80,11 +80,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install python
-      uses: actions/setup-python@v5
-      with:
-          python-version: '3.12'
-
     - name: Install Miniconda
       uses: conda-incubator/setup-miniconda@v3
       with:
@@ -100,7 +95,7 @@ jobs:
 
     - name: Test wheel in a clean environment
       run: |
-        ls conda_dist
-        conda install -y --use-local conda_dist/*.whl
+        conda insta pip
+        pip install conda_dist/*.whl
         python -m pytest --pyargs coincurve
         
