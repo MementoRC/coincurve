@@ -95,7 +95,7 @@ jobs:
 
     - name: Test wheel in a clean environment
       run: |
-        conda insta pip
+        conda install pip
         pip install conda_dist/*.whl
         python -m pytest --pyargs coincurve
         
