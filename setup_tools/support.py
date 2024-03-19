@@ -157,6 +157,7 @@ def verify_system_lib(lib_dir):
 
     def load_library(lib):
         try:
+            logging.warning(f'loading {lib}: {ctypes.CDLL(lib)}')
             return ctypes.CDLL(lib)
         except OSError as e:
             logging.warning(f'{e = }')
@@ -172,6 +173,7 @@ def verify_system_lib(lib_dir):
     # Evaluates the dynamic libraries found,
     logging.warning(f'Found libraries: {l_dyn}')
     dyn_lib = next((lib for lib in l_dyn if load_library(lib) is not None), False)
+    logging.warning(f'Dyn libraries: {dyn_lib}')
 
     found = any((dyn_lib and SECP256K1_BUILD == 'SHARED', not dyn_lib and SECP256K1_BUILD != 'SHARED'))
     if not found:
