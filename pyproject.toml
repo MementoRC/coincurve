@@ -54,29 +54,37 @@ Repository = 'https://github.com/ofek/coincurve'
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 cmake.verbose = true
 logging.level = 'INFO'
-wheel.packages = []
+wheel.packages = ['src/coincurve']
 cmake.build-type = 'Release'
-install.components = ["python"]
 
 # Needed for scikit-build-core to compute the version
+# (do not put the module, it would be overwritten)
 [tool.setuptools_scm]
 
 [tool.scikit-build.cmake.define]
 # Coincurve build options
 COINCURVE_IGNORE_SYSTEM_LIB = 'ON'
 COINCURVE_CROSS_HOST = 'OFF'
-# SECP256K1 library
-SECP256K1_UPSTREAM_URL = 'https://github.com/bitcoin-core/secp256k1/archive/'
-SECP256K1_UPSTREAM_REF = {env='COINCURVE_UPSTREAM_REF', default='1ad5185cd42c0636104129fcc9f6a4bf9c67cc40'}
-SECP256K1_UPSTREAM_SHA = {env='COINCURVE_UPSTREAM_SHA', default='ba34be4319f505c5766aa80b99cfa696cbb2993bfecf7d7eb8696106c493cb8c'}
-# SECP256K1 library build options
-SECP256K1_DISABLE_SHARED = {env='COINCURVE_SECP256K1_SHARED', default='OFF'}
-SECP256K1_BUILD_BENCHMARK='OFF'
-SECP256K1_BUILD_TESTS='OFF'
-SECP256K1_ENABLE_MODULE_ECDH='ON'
-SECP256K1_ENABLE_MODULE_RECOVERY='ON'
-SECP256K1_ENABLE_MODULE_SCHNORRSIG='ON'
-SECP256K1_ENABLE_MODULE_EXTRAKEYS='ON'
+# Vendored library: SECP256K1
+VENDORED_LIBRARY_PKG_CONFIG = 'secp256k1'
+VENDORED_UPSTREAM_URL = 'https://github.com/bitcoin-core/secp256k1/archive/'
+VENDORED_UPSTREAM_REF = {env='COINCURVE_UPSTREAM_REF', default='1ad5185cd42c0636104129fcc9f6a4bf9c67cc40'}
+VENDORED_UPSTREAM_SHA = {env='COINCURVE_UPSTREAM_SHA', default='ba34be4319f505c5766aa80b99cfa696cbb2993bfecf7d7eb8696106c493cb8c'}
+# SECP256K1 library specific build options
+# `VENDORED_OPTION` is reserved prefix for vendored library build options
+VENDORED_LIBRARY_OPTION_PREFIX = 'SECP256K1'
+VENDORED_OPTION_DISABLE_SHARED = {env='COINCURVE_SECP256K1_STATIC', default='ON'}
+VENDORED_OPTION_BUILD_BENCHMARK='OFF'
+VENDORED_OPTION_BUILD_TESTS='OFF'
+VENDORED_OPTION_BUILD_EXHAUSTIVE_TESTS='OFF'
+VENDORED_OPTION_ENABLE_MODULE_ECDH='ON'
+VENDORED_OPTION_ENABLE_MODULE_RECOVERY='ON'
+VENDORED_OPTION_ENABLE_MODULE_SCHNORRSIG='ON'
+VENDORED_OPTION_ENABLE_MODULE_EXTRAKEYS='ON'
+# Vendored library build options (cmake, compiler, linker, etc.)
+# VENDORED_CMAKE is reserved prefix for vendored library cmake options
+# VENDORED_CMAKE_<STATIC|SHARED>_<CMAKE_OPTION> = <VALUE>
+VENDORED_LIBRARY_BUILD_TYPE = 'STATIC'
 
 # --- other tools ---
 [tool.pytest.ini_options]
