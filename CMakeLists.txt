@@ -51,19 +51,20 @@ endif()
 # For Linux, we use cibuildwheel to build the wheels, which uses Docker
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(AUTOMATIC_OSX_TARGETS "armv7" "armv7s" "arm64" "arm64e" "x86_64")
-    if (NOT "${PROJECT_CROSS_COMPILE_TARGET}" STREQUAL "" AND "${PROJECT_CROSS_COMPILE_TARGET}" IN_LIST AUTOMATIC_OSX_TARGETS)
+    if ((NOT "${PROJECT_CROSS_COMPILE_TARGET}" STREQUAL "") AND "${PROJECT_CROSS_COMPILE_TARGET}" IN_LIST AUTOMATIC_OSX_TARGETS)
         # Cross-compilation for Linux host system:
         set(CMAKE_SYSTEM_PROCESSOR ${PROJECT_CROSS_COMPILE_TARGET})
     else()
-        message(FATAL_ERROR "Cross-compilation target not supported: ${PROJECT_CROSS_COMPILE_TARGET}")
+        message(FATAL_ERROR "Cross-compilation target not supported: ${PROJECT_CROSS_COMPILE_TARGET} (${AUTOMATIC_WINDOWS_TARGETS})")
     endif()
+
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(AUTOMATIC_WINDOWS_TARGETS "AMD64" "x86" "arm64")
-    if ("${PROJECT_CROSS_COMPILE_TARGET}" STREQUAL "" AND "${PROJECT_CROSS_COMPILE_TARGET}" IN_LIST AUTOMATIC_WINDOWS_TARGETS)
+    if ((NOT "${PROJECT_CROSS_COMPILE_TARGET}" STREQUAL "") AND "${PROJECT_CROSS_COMPILE_TARGET}" IN_LIST AUTOMATIC_WINDOWS_TARGETS)
         # Cross-compilation for Windows host system:
         set(CMAKE_SYSTEM_PROCESSOR ${PROJECT_CROSS_COMPILE_TARGET})
     else()
-        message(FATAL_ERROR "Cross-compilation target not supported: ${PROJECT_CROSS_COMPILE_TARGET}")
+        message(FATAL_ERROR "Cross-compilation target not supported: ${PROJECT_CROSS_COMPILE_TARGET} (${AUTOMATIC_WINDOWS_TARGETS})")
     endif()
 endif()
 
