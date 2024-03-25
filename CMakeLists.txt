@@ -50,7 +50,7 @@ endif()
 # Cross-compilation options: This is setup for Github/Actions runners
 # For Linux, we use cibuildwheel to build the wheels, which uses Docker
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    list(AUTOMATIC_OSX_TARGETS "armv7" "armv7s" "arm64" "arm64e" "x86_64")
+    set(AUTOMATIC_OSX_TARGETS "armv7" "armv7s" "arm64" "arm64e" "x86_64")
     if (PROJECT_CROSS_COMPILE_TARGET AND "${PROJECT_CROSS_COMPILE_TARGET}" IN_LIST AUTOMATIC_OSX_TARGETS)
         # Cross-compilation for Linux host system:
         set(CMAKE_SYSTEM_PROCESSOR ${PROJECT_CROSS_COMPILE_TARGET})
@@ -58,7 +58,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         message(FATAL_ERROR "Cross-compilation target not supported: ${PROJECT_CROSS_COMPILE_TARGET}")
     endif()
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    list(AUTOMATIC_WINDOWS_TARGETS "AMD64" "x86" "arm64")
+    set(AUTOMATIC_WINDOWS_TARGETS "AMD64" "x86" "arm64")
     if (PROJECT_CROSS_COMPILE_TARGET AND "${PROJECT_CROSS_COMPILE_TARGET}" IN_LIST AUTOMATIC_WINDOWS_TARGETS)
         # Cross-compilation for Windows host system:
         set(CMAKE_SYSTEM_PROCESSOR ${PROJECT_CROSS_COMPILE_TARGET})
@@ -79,6 +79,7 @@ list(APPEND ENV{PKG_CONFIG_PATH} "$ENV{CONDA_PREFIX}/lib/pkgconfig")
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PKGCONFIG_INPUT_LIB IMPORTED_TARGET ${CFFI_INPUT_LIBRARY}>=2)
 
+# Try to find the library in the system
 find_library(_INPUT_LIBRARY ${CFFI_INPUT_LIBRARY})
 if (COINCURVE_IGNORE_SYSTEM_LIB OR NOT _INPUT_LIBRARY)
     UpdateVendoredLibraryOptions("VENDORED_OPTION" ${VENDORED_LIBRARY_OPTION_PREFIX})
