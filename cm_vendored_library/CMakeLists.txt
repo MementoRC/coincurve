@@ -1,3 +1,7 @@
+# Note that this could also be handled by: ExternalProject_Add
+# However, FetchContent is a more modern and simpler way to handle this
+# https://cmake.org/cmake/help/latest/module/ExternalProject.html
+# https://cmake.org/cmake/help/latest/module/FetchContent.html
 include(GNUInstallDirs)
 include(FetchContent)
 

@@ -62,9 +62,10 @@ cmake.build-type = 'Release'
 [tool.setuptools_scm]
 
 [tool.scikit-build.cmake.define]
-# Coincurve build options
-COINCURVE_IGNORE_SYSTEM_LIB = 'ON'
-COINCURVE_CROSS_HOST = 'OFF'
+CMAKE_BUILD_TYPE = 'Release'
+# Coincurve build options - This may be better extracted from the ENV by the CMake directly?
+PROJECT_IGNORE_SYSTEM_LIB = {env='COINCURVE_IGNORE_SYSTEM_LIB', default='ON'}
+PROJECT_CROSS_COMPILE_TARGET = {env='COINCURVE_CROSS_HOST', default='OFF'}
 # Vendored library: SECP256K1
 VENDORED_LIBRARY_PKG_CONFIG = 'secp256k1'
 VENDORED_UPSTREAM_URL = 'https://github.com/bitcoin-core/secp256k1/archive/'
@@ -84,7 +85,7 @@ VENDORED_OPTION_ENABLE_MODULE_EXTRAKEYS='ON'
 # Vendored library build options (cmake, compiler, linker, etc.)
 # VENDORED_CMAKE is reserved prefix for vendored library cmake options
 # VENDORED_CMAKE_<STATIC|SHARED>_<CMAKE_OPTION> = <VALUE>
-VENDORED_LIBRARY_BUILD_TYPE = 'STATIC'
+VENDORED_LIBRARY_STATIC_BUILD = {env='COINCURVE_SECP256K1_STATIC', default='ON'}
 
 # --- other tools ---
 [tool.pytest.ini_options]
