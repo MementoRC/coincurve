@@ -37,4 +37,17 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_definitions(${CFFI_OUTPUT_LIBRARY} PUBLIC "IS_WINDOWS")
+
+    # Map the Debug properties to RELEASE for CFFI_OUTPUT_LIBRARY
+    set_target_properties(${CFFI_OUTPUT_LIBRARY} PROPERTIES MAP_IMPORTED_CONFIG_DEBUG RELEASE)
+    set_target_properties(${CFFI_OUTPUT_LIBRARY} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
+
+    # Add the python3.dll to the output directory. With Py_LIMITED_API on windows, the python3.dll is required
+    # to be in the same directory as the shared library (apparently for DEBUG
+    # add_custom_command(
+    #     TARGET ${CFFI_OUTPUT_LIBRARY} POST_BUILD
+    #     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    #                 $<TARGET_FILE:Python3::Python>
+    #                 $<TARGET_FILE_DIR:${CFFI_OUTPUT_LIBRARY}>
+    # )
 endif()
