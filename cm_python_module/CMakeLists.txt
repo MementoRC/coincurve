@@ -2,7 +2,7 @@
 # find_package(Python 3 REQUIRED COMPONENTS Interpreter Development.Module) will be needed - with space in the name
 # For a vendored library that includes python modules, then ExternalProject is needed
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    find_package(Python 3 REQUIRED COMPONENTS Development.Module Development.SABIModule)
+    find_package(Python 3 REQUIRED COMPONENTS Development.SABIModule)
 else()
     find_package(Python 3 REQUIRED COMPONENTS Development.Module)
 endif()
@@ -11,7 +11,7 @@ set(Python_SOABI ${SKBUILD_SOABI})
 
 # Create the shared library from the CFFI binding and the static library from ${CFFI_INPUT_LIBRARY}_vendor
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
+    Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE USE_SABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
 else()
     Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
 endif()
@@ -32,9 +32,9 @@ if (PROJECT_IGNORE_SYSTEM_LIB OR NOT LOCAL_INPUT_LIBRARY)
     # https://docs.python.org/3/c-api/stable.html#limited-c-api
     if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         # Windows seem to only work with the SABI module
-        target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY} Python::SABIModule)
+        target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY})
     else()
-        target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY} Python::Module)
+        target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY})
         target_compile_definitions(${CFFI_OUTPUT_LIBRARY} PRIVATE Py_LIMITED_API)
     endif()
 else()
