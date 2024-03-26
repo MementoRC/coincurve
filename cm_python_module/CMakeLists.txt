@@ -2,7 +2,7 @@
 # find_package(Python 3 REQUIRED COMPONENTS Interpreter Development.Module) will be needed - with space in the name
 # For a vendored library that includes python modules, then ExternalProject is needed
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    find_package(Python 3 REQUIRED COMPONENTS Development.SABIModule)
+    find_package(Python 3 REQUIRED COMPONENTS Development.Module Development.SABIModule)
 else()
     find_package(Python 3 REQUIRED COMPONENTS Development.Module)
 endif()
