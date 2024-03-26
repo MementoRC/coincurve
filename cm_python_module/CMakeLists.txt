@@ -18,10 +18,10 @@ if (PROJECT_IGNORE_SYSTEM_LIB OR NOT LOCAL_INPUT_LIBRARY)
     # for CMake: (This only happens on Windows though ...
     set(CMAKE_MODULE_LINKER_FLAGS_COVERAGE "")
 
-    # target_link_libraries(${CFFI_OUTPUT_LIBRARY} IMPORTED ${CFFI_INPUT_LIBRARY})
     add_dependencies(${CFFI_OUTPUT_LIBRARY} ${CFFI_INPUT_LIBRARY})
     add_dependencies(${CFFI_OUTPUT_LIBRARY} cffi-c-binding)
     target_include_directories(${CFFI_OUTPUT_LIBRARY} PUBLIC ${VENDORED_HEADERS_DIR})
+    target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY} Python3::Module)
     # target_compile_definitions(${CFFI_OUTPUT_LIBRARY} PRIVATE Py_LIMITED_API)
 else()
     target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE PkgConfig::PKGCONFIG_INPUT_LIB)
@@ -41,6 +41,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # Map the Debug properties to RELEASE for CFFI_OUTPUT_LIBRARY
     set_target_properties(${CFFI_OUTPUT_LIBRARY} PROPERTIES MAP_IMPORTED_CONFIG_DEBUG RELEASE)
     set_target_properties(${CFFI_OUTPUT_LIBRARY} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
+    set_target_properties(${CFFI_OUTPUT_LIBRARY} PROPERTIES MAP_IMPORTED_CONFIG_COVERAGE RELEASE)
 
     # Add the python3.dll to the output directory. With Py_LIMITED_API on windows, the python3.dll is required
     # to be in the same directory as the shared library (apparently for DEBUG
