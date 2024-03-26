@@ -26,7 +26,7 @@ endif()
 add_dependencies(${CFFI_OUTPUT_LIBRARY} cffi-c-binding)
 
 target_include_directories(${CFFI_OUTPUT_LIBRARY} PUBLIC ${VENDORED_HEADERS_DIR})
-target_compile_definitions(${CFFI_OUTPUT_LIBRARY} PRIVATE Py_LIMITED_API)
+# target_compile_definitions(${CFFI_OUTPUT_LIBRARY} PRIVATE Py_LIMITED_API)
 
 # Add platform-specific definitions
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
