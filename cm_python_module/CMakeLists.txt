@@ -17,7 +17,7 @@ if (PROJECT_IGNORE_SYSTEM_LIB OR NOT LOCAL_INPUT_LIBRARY)
     # for CMake: (This only happens on Windows though ...
     set(CMAKE_MODULE_LINKER_FLAGS_COVERAGE "")
 
-    target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY} Python3::Python)
+    target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY})
     add_dependencies(${CFFI_OUTPUT_LIBRARY} ${CFFI_INPUT_LIBRARY})
 else()
     target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE PkgConfig::PKGCONFIG_INPUT_LIB Python3::Python)
