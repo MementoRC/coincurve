@@ -4,6 +4,7 @@
 # https://cmake.org/cmake/help/latest/module/FetchContent.html
 include(GNUInstallDirs)
 include(FetchContent)
+include(UpdateVendoredLibraryOptions)
 
 # Set ULR based upon CMake definitions
 if (NOT VENDORED_UPSTREAM_URL)
@@ -17,6 +18,18 @@ endif()
 if (NOT VENDORED_UPSTREAM_SHA)
     set(VENDORED_UPSTREAM_SHA "ba34be4319f505c5766aa80b99cfa696cbb2993bfecf7d7eb8696106c493cb8c")
 endif()
+
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# -fPIC is needed since we will link it from a shared object
+if (VENDORED_LIBRARY_STATIC_BUILD)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
+
+UpdateVendoredLibraryOptions("VENDORED_OPTION" ${VENDORED_LIBRARY_OPTION_PREFIX})
+
 
 FetchContent_Declare(
     vendored_library

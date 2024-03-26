@@ -1,6 +1,8 @@
 # create folder for _gen code
 file(MAKE_DIRECTORY ${CFFI_HEADERS_DIR})
 
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
 macro(generate_cffi_header src_header cffi_header cffi_dir)
     add_custom_command(
         OUTPUT              ${cffi_dir}/${cffi_header}

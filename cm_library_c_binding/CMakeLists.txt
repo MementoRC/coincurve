@@ -12,6 +12,8 @@ endif()
 # Copy the build.py file to the build directory
 file(COPY ${CMAKE_CURRENT_LIST_DIR}/build.py DESTINATION ${CFFI_C_CODE_DIR})
 
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
 # Generate the CFFI source file
 add_custom_command(
     OUTPUT                ${CFFI_C_CODE_DIR}/${CFFI_C_CODE}
