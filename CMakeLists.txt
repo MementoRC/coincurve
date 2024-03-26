@@ -24,7 +24,7 @@ set(CFFI_OUTPUT_LIBRARY "_lib${CFFI_INPUT_LIBRARY}")
 
 
 # Define python
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module Development.Embed)
 set(Python3_SOABI ${SKBUILD_SOABI})
 
 # Try to fix odd issue with Python3.dll not found on windows.CMAKE_SYSTEM_NAME
@@ -57,19 +57,33 @@ endif()
 # For Linux, we use cibuildwheel to build the wheels, which uses Docker
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(AUTOMATIC_OSX_TARGETS "armv7" "armv7s" "arm64" "arm64e" "x86_64")
+
+    if (PROJECT_CROSS_COMPILE_TARGET)
+        message(STATUS "Cross-compilation target: >${PROJECT_CROSS_COMPILE_TARGET}<")
+    else()
+        message(STATUS "Cross-compilation target not set: >${PROJECT_CROSS_COMPILE_TARGET}<")
+    endif()
+
     if ((NOT "${PROJECT_CROSS_COMPILE_TARGET}-" STREQUAL "-") AND "${PROJECT_CROSS_COMPILE_TARGET}" IN_LIST AUTOMATIC_OSX_TARGETS)
         set(CMAKE_OSX_ARCHITECTURES ${PROJECT_CROSS_COMPILE_TARGET})
     else()
-        message(FATAL_ERROR "Cross-compilation target not supported: ${PROJECT_CROSS_COMPILE_TARGET} (${AUTOMATIC_OSX_TARGETS})")
+        message(FATAL_ERROR "Cross-compilation target not supported: >${PROJECT_CROSS_COMPILE_TARGET}< (${AUTOMATIC_OSX_TARGETS})")
     endif()
 
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(AUTOMATIC_WINDOWS_TARGETS "AMD64" "x86" "arm64")
+
+    if (PROJECT_CROSS_COMPILE_TARGET)
+        message(STATUS "Cross-compilation target: >${PROJECT_CROSS_COMPILE_TARGET}<")
+    else()
+        message(STATUS "Cross-compilation target not set: >${PROJECT_CROSS_COMPILE_TARGET}<")
+    endif()
+
     if ((NOT "${PROJECT_CROSS_COMPILE_TARGET}-" STREQUAL "-") AND "${PROJECT_CROSS_COMPILE_TARGET}" IN_LIST AUTOMATIC_WINDOWS_TARGETS)
         # Cross-compilation for Windows host system:
         set(CMAKE_SYSTEM_PROCESSOR ${PROJECT_CROSS_COMPILE_TARGET})
     else()
-        message(FATAL_ERROR "Cross-compilation target not supported: ${PROJECT_CROSS_COMPILE_TARGET} (${AUTOMATIC_WINDOWS_TARGETS})")
+        message(FATAL_ERROR "Cross-compilation target not supported: >${PROJECT_CROSS_COMPILE_TARGET}< (${AUTOMATIC_WINDOWS_TARGETS})")
     endif()
 endif()
 
@@ -109,10 +123,10 @@ if (PROJECT_IGNORE_SYSTEM_LIB OR NOT _INPUT_LIBRARY)
     # for CMake: (This only happens on Windows though ...
     set(CMAKE_MODULE_LINKER_FLAGS_COVERAGE "")
 
-    target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY})
+    target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY} Python3::Python)
     add_dependencies(${CFFI_OUTPUT_LIBRARY} ${CFFI_INPUT_LIBRARY})
 else()
-    target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE PkgConfig::PKGCONFIG_INPUT_LIB)
+    target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE PkgConfig::PKGCONFIG_INPUT_LIB Python3::Python)
 endif()
 
 add_dependencies(${CFFI_OUTPUT_LIBRARY} cffi-c-binding)

@@ -65,7 +65,7 @@ cmake.build-type = 'Release'
 CMAKE_BUILD_TYPE = 'Release'
 # Coincurve build options - This may be better extracted from the ENV by the CMake directly?
 PROJECT_IGNORE_SYSTEM_LIB = {env='COINCURVE_IGNORE_SYSTEM_LIB', default='ON'}
-PROJECT_CROSS_COMPILE_TARGET = {env='COINCURVE_CROSS_HOST', default='OFF'}
+PROJECT_CROSS_COMPILE_TARGET = {env='COINCURVE_CROSS_HOST', default=''}
 # Vendored library: SECP256K1
 VENDORED_LIBRARY_PKG_CONFIG = 'secp256k1'
 VENDORED_UPSTREAM_URL = 'https://github.com/bitcoin-core/secp256k1/archive/'
