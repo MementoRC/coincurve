@@ -1,12 +1,4 @@
-# Define python
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module Development.SABIModule)
 set(Python3_SOABI ${SKBUILD_SOABI})
-
-# Try to fix odd issue with Python3.dll not found on windows.CMAKE_SYSTEM_NAME
-# It seems to originated from the multi-config that generates a DEBUG config
-# It also generate a Coverage config that requires setting an empty variable later
-# set_target_properties(Python3::Module PROPERTIES MAP_IMPORTED_CONFIG_DEBUG RELEASE)
-# set_target_properties(Python3::Module PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
 
 # Create the shared library from the CFFI binding and the static library from ${CFFI_INPUT_LIBRARY}_vendor
 Python3_add_library(${CFFI_OUTPUT_LIBRARY} MODULE WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
@@ -21,8 +13,16 @@ if (PROJECT_IGNORE_SYSTEM_LIB OR NOT LOCAL_INPUT_LIBRARY)
     add_dependencies(${CFFI_OUTPUT_LIBRARY} ${CFFI_INPUT_LIBRARY})
     add_dependencies(${CFFI_OUTPUT_LIBRARY} cffi-c-binding)
     target_include_directories(${CFFI_OUTPUT_LIBRARY} PUBLIC ${VENDORED_HEADERS_DIR})
-    target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY} Python3::SABIModule)
-    # target_compile_definitions(${CFFI_OUTPUT_LIBRARY} PRIVATE Py_LIMITED_API)
+
+    # Link the vendored library to the output library
+    # https://docs.python.org/3/c-api/stable.html#limited-c-api
+    if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        # Windows seem to only work with the SABI module
+        target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY} Python3::SABIModule)
+    else()
+        target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY} Python3::Module)
+        target_compile_definitions(${CFFI_OUTPUT_LIBRARY} PRIVATE Py_LIMITED_API)
+    endif()
 else()
     target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE PkgConfig::PKGCONFIG_INPUT_LIB)
 endif()
@@ -37,18 +37,4 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_definitions(${CFFI_OUTPUT_LIBRARY} PUBLIC "IS_WINDOWS")
-
-    # Map the Debug properties to RELEASE for CFFI_OUTPUT_LIBRARY
-    set_target_properties(${CFFI_OUTPUT_LIBRARY} PROPERTIES MAP_IMPORTED_CONFIG_DEBUG RELEASE)
-    set_target_properties(${CFFI_OUTPUT_LIBRARY} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
-    set_target_properties(${CFFI_OUTPUT_LIBRARY} PROPERTIES MAP_IMPORTED_CONFIG_COVERAGE RELEASE)
-
-    # Add the python3.dll to the output directory. With Py_LIMITED_API on windows, the python3.dll is required
-    # to be in the same directory as the shared library (apparently for DEBUG
-    # add_custom_command(
-    #     TARGET ${CFFI_OUTPUT_LIBRARY} POST_BUILD
-    #     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    #                 $<TARGET_FILE:Python3::Python>
-    #                 $<TARGET_FILE_DIR:${CFFI_OUTPUT_LIBRARY}>
-    # )
 endif()

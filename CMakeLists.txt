@@ -21,8 +21,18 @@ set(CFFI_HEADERS_DIR ${PROJECT_BINARY_DIR}/_gen_cffi_headers)
 # Shared object that wraps the CFFI binding and the vendored library
 set(CFFI_OUTPUT_LIBRARY "_lib${CFFI_INPUT_LIBRARY}")
 
+
+# Define common python. Note that for cross-compilation, a new environment is likely cmake_minimum_required
+# find_package(Python 3 REQUIRED COMPONENTS Interpreter Development.Module) will be needed - with space in the name
+# For a vendored library that includes python modules, then ExternalProject is needed
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development.SABIModule)
+else()
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
+endif()
+
 include(VerifyPythonModule)
-VerifyPythonModule(cffi)
+VerifyPythonModule(cffi ${Python3_EXECUTABLE})
 
 
 # Cross-compilation options: This is setup for Github/Actions runners
