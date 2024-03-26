@@ -13,7 +13,7 @@ include(UpdateVendoredLibraryOptions)
 set(CFFI_INPUT_LIBRARY ${VENDORED_LIBRARY_PKG_CONFIG})  # Should be searchable by pkg-config
 
 
-# This is needed to define Python_add_library()
+# This is needed to define Python3_add_library()
 set(CFFI_C_CODE_DIR ${PROJECT_BINARY_DIR}/_gen_c_file)
 set(CFFI_C_CODE "${CFFI_INPUT_LIBRARY}_cffi_bindings.c")
 set(CFFI_HEADERS_DIR ${PROJECT_BINARY_DIR}/_gen_cffi_headers)
@@ -24,19 +24,19 @@ set(CFFI_OUTPUT_LIBRARY "_lib${CFFI_INPUT_LIBRARY}")
 
 
 # Define python
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
-set(Python_SOABI ${SKBUILD_SOABI})
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
+set(Python3_SOABI ${SKBUILD_SOABI})
 
-# Try to fix odd issue with Python.dll not found on windows.CMAKE_SYSTEM_NAME
+# Try to fix odd issue with Python3.dll not found on windows.CMAKE_SYSTEM_NAME
 # It seems to originated from the multi-config that generates a DEBUG config
 # It also generate a Coverage config that requires setting an empty variable later
-set_target_properties(Python::Module PROPERTIES MAP_IMPORTED_CONFIG_DEBUG RELEASE)
-set_target_properties(Python::Module PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
+# set_target_properties(Python3::Module PROPERTIES MAP_IMPORTED_CONFIG_DEBUG RELEASE)
+# set_target_properties(Python3::Module PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
 
 
 # Verify CFFI python module is available
 execute_process(
-    COMMAND         ${Python3_EXECUTABLE} -c "import cffi"
+    COMMAND         ${Python33_EXECUTABLE} -c "import cffi"
     ERROR_VARIABLE  _cffi_error
     OUTPUT_QUIET
     ERROR_STRIP_TRAILING_WHITESPACE
@@ -74,7 +74,7 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 
-# -fPIC is needed since we create a shared object to be loaded by Python
+# -fPIC is needed since we create a shared object to be loaded by Python3
 if (VENDORED_LIBRARY_STATIC_BUILD)
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
@@ -100,7 +100,7 @@ add_subdirectory(cm_library_c_binding)
 
 
 # Create the shared library from the CFFI binding and the static library from ${CFFI_INPUT_LIBRARY}_vendor
-Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
+Python3_add_library(${CFFI_OUTPUT_LIBRARY} MODULE WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
 set_source_files_properties("${CFFI_C_CODE_DIR}${CFFI_C_CODE}" PROPERTIES GENERATED 1)
 
 

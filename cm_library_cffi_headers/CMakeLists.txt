@@ -4,7 +4,7 @@ file(MAKE_DIRECTORY ${CFFI_HEADERS_DIR})
 macro(generate_cffi_header src_header cffi_header cffi_dir)
     add_custom_command(
         OUTPUT              ${cffi_dir}/${cffi_header}
-        COMMAND             ${Python_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/compose_cffi_headers.py
+        COMMAND             ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/compose_cffi_headers.py
                             ${src_header} ${cffi_header} ${cffi_dir}
         MAIN_DEPENDENCY     ${CMAKE_CURRENT_LIST_DIR}/compose_cffi_headers.py
         DEPENDS             ${src_header}
