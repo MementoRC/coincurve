@@ -9,30 +9,16 @@ project(${SKBUILD_PROJECT_NAME}
 # Path to custom CMake functions
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-set(CFFI_INPUT_LIBRARY ${VENDORED_LIBRARY_PKG_CONFIG})  # Should be searchable by pkg-config
+# Name of the vendored library recognized by pkg-config
+set(CFFI_INPUT_LIBRARY ${VENDORED_LIBRARY_PKG_CONFIG})
 
-
-# This is needed to define Python3_add_library()
+# Set the output directories for the generated C code and headers
 set(CFFI_C_CODE_DIR ${PROJECT_BINARY_DIR}/_gen_c_file)
 set(CFFI_C_CODE "${CFFI_INPUT_LIBRARY}_cffi_bindings.c")
 set(CFFI_HEADERS_DIR ${PROJECT_BINARY_DIR}/_gen_cffi_headers)
 
-
 # Shared object that wraps the CFFI binding and the vendored library
 set(CFFI_OUTPUT_LIBRARY "_lib${CFFI_INPUT_LIBRARY}")
-
-
-# Define common python. Note that for cross-compilation, a new environment is likely cmake_minimum_required
-# find_package(Python 3 REQUIRED COMPONENTS Interpreter Development.Module) will be needed - with space in the name
-# For a vendored library that includes python modules, then ExternalProject is needed
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    find_package(Python3 REQUIRED COMPONENTS Interpreter Development.SABIModule)
-else()
-    find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
-endif()
-
-include(VerifyPythonModule)
-VerifyPythonModule(cffi ${Python3_EXECUTABLE})
 
 
 # Cross-compilation options: This is setup for Github/Actions runners

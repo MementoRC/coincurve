@@ -12,10 +12,19 @@ endif()
 # Copy the build.py file to the build directory
 file(COPY ${CMAKE_CURRENT_LIST_DIR}/build.py DESTINATION ${CFFI_C_CODE_DIR})
 
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    find_package(Python 3 REQUIRED COMPONENTS Development.SABIModule)
+else()
+    find_package(Python 3 REQUIRED COMPONENTS Development.Module)
+endif()
+
+include(VerifyPythonModule)
+VerifyPythonModule(cffi ${Python_EXECUTABLE})
+
 # Generate the CFFI source file
 add_custom_command(
     OUTPUT                ${CFFI_C_CODE_DIR}/${CFFI_C_CODE}
-    COMMAND               ${Python3_EXECUTABLE} ${CFFI_C_CODE_DIR}/build.py
+    COMMAND               ${Python_EXECUTABLE} ${CFFI_C_CODE_DIR}/build.py
                           ${CFFI_HEADERS_DIR}
                           ${CFFI_C_CODE_DIR}/${CFFI_C_CODE} '1'
     MAIN_DEPENDENCY       ${CMAKE_CURRENT_LIST_DIR}/build.py
