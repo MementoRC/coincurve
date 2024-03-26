@@ -7,10 +7,15 @@ else()
     find_package(Python 3 REQUIRED COMPONENTS Development.Module)
 endif()
 
-set(Python3_SOABI ${SKBUILD_SOABI})
+set(Python_SOABI ${SKBUILD_SOABI})
 
 # Create the shared library from the CFFI binding and the static library from ${CFFI_INPUT_LIBRARY}_vendor
-Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE USE_SABI 3.8 WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
+else()
+    Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
+endif()
+
 set_source_files_properties("${CFFI_C_CODE_DIR}${CFFI_C_CODE}" PROPERTIES GENERATED 1)
 
 # Detect whether the vendored library is a system library or not
@@ -18,6 +23,8 @@ if (PROJECT_IGNORE_SYSTEM_LIB OR NOT LOCAL_INPUT_LIBRARY)
     # The build-type seems to be defined as 'MODULE', which creates issues with missing variables
     # for CMake: (This only happens on Windows though ...
     set(CMAKE_MODULE_LINKER_FLAGS_COVERAGE "")
+
+    set_target_properties(${CFFI_OUTPUT_LIBRARY} PROPERTIES USE_SABIMODULE TRUE)
 
     add_dependencies(${CFFI_OUTPUT_LIBRARY} ${CFFI_INPUT_LIBRARY})
     add_dependencies(${CFFI_OUTPUT_LIBRARY} cffi-c-binding)
