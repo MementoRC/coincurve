@@ -3,19 +3,19 @@
 # For a vendored library that includes python modules, then ExternalProject is needed
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(CMAKE_FIND_DEBUG_MODE TRUE)
-    find_package(Python 3 REQUIRED COMPONENTS Development.SABIModule)
+    find_package(Python3 REQUIRED COMPONENTS Development.SABIModule)
     set(CMAKE_FIND_DEBUG_MODE FALSE)
 else()
-    find_package(Python 3 REQUIRED COMPONENTS Development.Module)
+    find_package(Python3 REQUIRED COMPONENTS Development.Module)
 endif()
 
 set(Python_SOABI ${SKBUILD_SOABI})
 
 # Create the shared library from the CFFI binding and the static library from ${CFFI_INPUT_LIBRARY}_vendor
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE USE_SABI 3.8 "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
+    Python3_add_library(${CFFI_OUTPUT_LIBRARY} MODULE USE_SABI 3.8 "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
 else()
-    Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
+    Python3_add_library(${CFFI_OUTPUT_LIBRARY} MODULE WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
 endif()
 
 set_source_files_properties("${CFFI_C_CODE_DIR}${CFFI_C_CODE}" PROPERTIES GENERATED 1)
