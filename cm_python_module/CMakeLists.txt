@@ -1,5 +1,5 @@
 # Define python
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module Development.Embed)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
 set(Python3_SOABI ${SKBUILD_SOABI})
 
 # Try to fix odd issue with Python3.dll not found on windows.CMAKE_SYSTEM_NAME
