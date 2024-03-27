@@ -2,9 +2,9 @@
 # find_package(Python 3 REQUIRED COMPONENTS Interpreter Development.Module) will be needed - with space in the name
 # For a vendored library that includes python modules, then ExternalProject is needed
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    find_package(Python3 REQUIRED COMPONENTS Development.SABIModule)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development.SABIModule)
 else()
-    find_package(Python3 REQUIRED COMPONENTS Development.Module)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
 endif()
 
 set(Python_SOABI ${SKBUILD_SOABI})
