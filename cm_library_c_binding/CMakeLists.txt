@@ -13,7 +13,7 @@ endif()
 file(COPY ${CMAKE_CURRENT_LIST_DIR}/build.py DESTINATION ${CFFI_C_CODE_DIR})
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    find_package(Python3 REQUIRED COMPONENTS Development.SABIModule)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development.SABIModule)
 else()
     find_package(Python3 REQUIRED COMPONENTS Development.Module)
 endif()
