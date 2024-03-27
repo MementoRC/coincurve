@@ -21,6 +21,9 @@ set(CFFI_HEADERS_DIR ${PROJECT_BINARY_DIR}/_gen_cffi_headers)
 set(CFFI_OUTPUT_LIBRARY "_lib${CFFI_INPUT_LIBRARY}")
 
 
+# Setting python for the host system (before change in CMAKE_SYSTEM_PROCESSOR)
+find_package(Python 3 REQUIRED COMPONENTS Interpreter)
+
 # Cross-compilation options: This is setup for Github/Actions runners
 # For Linux, we use cibuildwheel to build the wheels, which uses Docker
 if (PROJECT_CROSS_COMPILE_TARGET AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -49,7 +52,6 @@ elseif (PROJECT_CROSS_COMPILE_TARGET AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
         message(FATAL_ERROR "Cross-compilation target not supported: >${PROJECT_CROSS_COMPILE_TARGET}< (${AUTOMATIC_WINDOWS_TARGETS})")
     endif()
 endif()
-
 
 # Add the subdirectories. Append CONDA to the PKG_CONFIG_PATH
 list(APPEND ENV{PKG_CONFIG_PATH} "$ENV{CONDA_PREFIX}/lib/pkgconfig")
