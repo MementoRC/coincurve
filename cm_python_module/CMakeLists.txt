@@ -32,7 +32,7 @@ if (PROJECT_IGNORE_SYSTEM_LIB OR NOT LOCAL_INPUT_LIBRARY)
     # https://docs.python.org/3/c-api/stable.html#limited-c-api
     if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         # Windows seem to only work with the SABI module
-        target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY} Python3_SABIModule)
+        target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY} Python3::SABIModule)
     else()
         target_link_libraries(${CFFI_OUTPUT_LIBRARY} PRIVATE ${CFFI_INPUT_LIBRARY})
         target_compile_definitions(${CFFI_OUTPUT_LIBRARY} PRIVATE Py_LIMITED_API)
