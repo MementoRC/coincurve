@@ -148,7 +148,7 @@ def verify_system_lib(lib_dir, inst_dir='src'):
     import ctypes
     from pathlib import Path
 
-    from setup import LIB_NAME, PKG_NAME, SECP256K1_BUILD, SYSTEM
+    from setup import LIB_NAME, SECP256K1_BUILD, SYSTEM
 
     def load_library(lib):
         try:
@@ -171,10 +171,5 @@ def verify_system_lib(lib_dir, inst_dir='src'):
             f'Please ensure that the {SECP256K1_BUILD} library is installed.'
         )
 
-    if dyn_lib and inst_dir is not None:
-        lib_base = dyn_lib.name
-        # Update coincurve._secp256k1_library_info
-        info_file = Path(inst_dir, PKG_NAME, '_secp256k1_library_info.py')
-        info_file.write_text(f"SECP256K1_LIBRARY_NAME = '{lib_base}'\nSECP256K1_LIBRARY_TYPE = 'EXTERNAL'\n")
 
     return found
