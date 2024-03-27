@@ -171,5 +171,4 @@ def verify_system_lib(lib_dir, inst_dir='src'):
             f'Please ensure that the {SECP256K1_BUILD} library is installed.'
         )
 
-
     return found
