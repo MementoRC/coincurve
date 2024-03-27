@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26...3.26)
+cmake_minimum_required(VERSION 3.26)
 
 project(${SKBUILD_PROJECT_NAME}
     VERSION ${SKBUILD_PROJECT_VERSION}
@@ -42,12 +42,6 @@ elseif (PROJECT_CROSS_COMPILE_TARGET AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
         # Cross-compilation for Windows host system:
         set(CMAKE_SYSTEM_PROCESSOR ${PROJECT_CROSS_COMPILE_TARGET})
         set(CMAKE_LIBRARY_ARCHITECTURE  ${PROJECT_CROSS_COMPILE_TARGET})
-
-        # if (PROJECT_CROSS_COMPILE_TARGET STREQUAL "arm64")
-        #     set(CMAKE_CROSSCOMPILING 1)
-        #     set(CMAKE_SYSTEM_PROCESSOR arm)
-        #     set(CMAKE_GENERATOR_PLATFORM "ARM64")
-        # endif()
     else()
         message(FATAL_ERROR "Cross-compilation target not supported: >${PROJECT_CROSS_COMPILE_TARGET}< (${AUTOMATIC_WINDOWS_TARGETS})")
     endif()
