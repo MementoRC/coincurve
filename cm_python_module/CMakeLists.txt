@@ -10,12 +10,12 @@
 
 # Create the shared library from the CFFI binding and the static library from ${CFFI_INPUT_LIBRARY}_vendor
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    find_package(Python3 REQUIRED COMPONENTS Development.SABIModule)
-    Python3_add_library(${CFFI_OUTPUT_LIBRARY} MODULE USE_SABI 3.8 "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
+    #find_package(Python3 REQUIRED COMPONENTS Development.SABIModule)
+    Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE USE_SABI 3.8 "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
 else()
-    find_package(Python3 REQUIRED COMPONENTS Development.Module)
-    set(Python3_SOABI ${SKBUILD_SOABI})
-    Python3_add_library(${CFFI_OUTPUT_LIBRARY} MODULE WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
+    #find_package(Python3 REQUIRED COMPONENTS Development.Module)
+    set(Python_SOABI ${SKBUILD_SOABI})
+    Python_add_library(${CFFI_OUTPUT_LIBRARY} MODULE WITH_SOABI "${CFFI_C_CODE_DIR}/${CFFI_C_CODE}")
 endif()
 
 set_source_files_properties("${CFFI_C_CODE_DIR}${CFFI_C_CODE}" PROPERTIES GENERATED 1)

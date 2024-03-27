@@ -22,7 +22,7 @@ set(CFFI_OUTPUT_LIBRARY "_lib${CFFI_INPUT_LIBRARY}")
 
 
 # Setting python for the host system (before change in CMAKE_SYSTEM_PROCESSOR)
-find_package(Python 3 REQUIRED COMPONENTS Interpreter)
+find_package(Python 3 REQUIRED COMPONENTS Interpreter Development.Module Development.SABIModule)
 
 # Cross-compilation options: This is setup for Github/Actions runners
 # For Linux, we use cibuildwheel to build the wheels, which uses Docker
